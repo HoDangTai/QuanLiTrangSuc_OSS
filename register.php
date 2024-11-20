@@ -194,7 +194,9 @@ if(isset($_POST['register'])){
         </form>
     </div>
     <div class="footer">
-        &copy; 2023 Tên Công Ty Của Bạn. Đã đăng ký bản quyền.
+        <div class="container">
+            &copy; Công ty Pandora Việt Nam
+        </div>
     </div>
     <script>
         function togglePasswordVisibility() {
