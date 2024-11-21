@@ -158,7 +158,7 @@ h2 {
         <header class="header">
             <nav>
                 <div class="left-section">
-                    <img src="images/images/logo.jpg" href="/QLTS/TrangchuAdmin.php"width="100px" height="70" alt="logo">
+                    <img src="images/images/logo.jpg" href="TrangchuAdmin.php"width="100px" height="70" alt="logo">
                     <!-- <h1>Logo</h1> -->
                 </div>
                 <div class="right-section">
