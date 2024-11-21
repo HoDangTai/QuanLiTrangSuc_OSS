@@ -1,6 +1,6 @@
 <?php
     session_start();
-
+    require 'config.php';
     // Check if the user is logged in
     if (!isset($_SESSION['user_id'])) {
         // Redirect to the login page if not logged in
@@ -14,22 +14,36 @@
     $user_type = $_SESSION['user_type'];
     $id_ts="";
     
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_id'])) {
+    // Thêm sản phẩm vào giỏ hàng
+    if (isset($_POST['add_to_cart'])) {
         $product_id = $_POST['product_id'];
-        $quantity = 1; // Số lượng mặc định là 1 khi thêm vào giỏ hàng
+        $product_name = $_POST['product_name'];
+        $product_price = $_POST['product_price'];
 
-        // Kiểm tra nếu sản phẩm đã có trong giỏ hàng
-        if (isset($_SESSION['cart'][$product_id])) {
-            $_SESSION['cart'][$product_id] += $quantity;
-        } else {
-            $_SESSION['cart'][$product_id] = $quantity;
+        // Tạo session lưu thông tin sản phẩm
+        if (!isset($_SESSION['cart'])) {
+            $_SESSION['cart'] = [];
         }
 
-        echo "Sản phẩm đã được thêm vào giỏ hàng!";
+        // Kiểm tra sản phẩm có tồn tại trong giỏ hàng hay chưa
+        $is_existing = false;
+        foreach ($_SESSION['cart'] as &$item) {
+            if ($item['id'] == $product_id) {
+                $item['quantity'] += 1; // Tăng số lượng nếu đã có
+                $is_existing = true;
+                break;
+            }
+        }
+        if (!$is_existing) {
+            $_SESSION['cart'][] = [
+                'id' => $product_id,
+                'name' => $product_name,
+                'price' => $product_price,
+                'quantity' => 1
+            ];
+        }
+        header("Location: giohang.php"); // Chuyển hướng sau khi thêm vào giỏ hàng
+        exit();
     }
 ?>
     
@@ -302,6 +316,7 @@ body {
 </style>
 
 </head>
+
 <body>
     <header id="new-header" class="stickystack">
         <div class="new-header-top">
@@ -513,79 +528,72 @@ body {
     </header>
     </div>
     <div class="container">
-        <div class="bd-example">
-            <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
-                <ol class="carousel-indicators">
-                    <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
-                    <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
-                </ol>
+    <div class="bd-example">
+        <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+            <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+        </ol>
         
+        </div>
+  </div>
+  <div>
+  <?php
+include "config.php"; // Đảm bảo file config kết nối thành công
+
+// Kiểm tra và nhận giá trị ID_TS từ URL
+$id_ts = isset($_GET['ID_TS']) ? trim($_GET['ID_TS']) : null;
+
+if ($id_ts) {
+    // Truy vấn chi tiết sản phẩm
+    $query = 'SELECT SANPHAM.*, LOAITRANGSUC.TENLOAITS, NCC.NAME_NCC 
+              FROM SANPHAM 
+              JOIN LOAITRANGSUC ON SANPHAM.ID_LOAITS = LOAITRANGSUC.ID_LOAITS 
+              JOIN NCC ON SANPHAM.ID_NCC = NCC.ID_NCC 
+              WHERE SANPHAM.ID_TS = ?';
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $id_ts);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Kiểm tra kết quả
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        ?>
+        <div class="product-container">
+            <div class="product-image">
+                <br><br>
+                <img src="images/<?= htmlspecialchars($row['ANH']); ?>" width="550" height="550">
+            </div>
+            <div class="product-info">
+                <br><br>
+                <h2 style="text-align:center"><?= htmlspecialchars($row['TENTS']); ?></h2>
+                <br>
+                <p class="gia"><?= htmlspecialchars($row['GIA']); ?> VNĐ</p>
+                <p style="text-align:center"><strong>Bảo hành:</strong> <?= htmlspecialchars($row['BAOHANH']); ?> năm</p>
+                <p style="text-align:center"><strong>Loại trang sức:</strong> <?= htmlspecialchars($row['TENLOAITS']); ?></p>
+                <p style="text-align:center"><strong>Nhà cung cấp:</strong> <?= htmlspecialchars($row['NAME_NCC']); ?></p>
+                <p style="text-align:center"><strong>Tình trạng:</strong> <?= htmlspecialchars($row['TINHTRANG']); ?></p>
+                <br>
+                <p><?= nl2br(htmlspecialchars($row['MOTA'])); ?></p>
+                <br><br>
+                <form method="post" action="">
+                    <input type="hidden" name="product_id" value="<?= htmlspecialchars($row['ID_TS']); ?>">
+                    <input type="hidden" name="product_name" value="<?= htmlspecialchars($row['TENTS']); ?>">
+                    <input type="hidden" name="product_price" value="<?= htmlspecialchars($row['GIA']); ?>">
+                    <button type="submit" name="add_to_cart" class="btn btn-primary">Thêm vào giỏ hàng</button>
+                </form>
             </div>
         </div>
-        <div>
-            <?php
-            include "config.php";
+        <?php
+    } else {
+        echo "Không tìm thấy sản phẩm.";
+    }
+} else {
+    echo "Không có ID_TS được truyền vào.";
+}
 
-            if (isset($_GET['ID_TS'])) {
-            $id_ts= $_GET['ID_TS'];
-
-            $query = 'SELECT SANPHAM.*, LOAITRANGSUC.TENLOAITS, NCC.NAME_NCC 
-            FROM SANPHAM 
-            JOIN LOAITRANGSUC ON SANPHAM.ID_LOAITS = LOAITRANGSUC.ID_LOAITS 
-            JOIN NCC ON SANPHAM.ID_NCC = NCC.ID_NCC 
-            WHERE SANPHAM.ID_TS = ?';
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("s", $id_ts);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
-                $row = $result->fetch_assoc();
-                ?>
-                <div class="product-container">
-                <div class="product-image">
-                <br>
-                <br>
-                <img src="images/<?= $row['ANH']; ?>" width="550" height="550" >
-                </div>
-                <div class="product-info">
-                    <br>
-                    <br>
-                    <h2 style="text-align:center"><?php echo $row['TENTS']; ?></h2>
-                    <br>
-                    <p class="gia"><?php echo $row['GIA']; ?> VNĐ</p>
-                    <p style="text-align:center"><strong>Bảo hành:</strong> <?php echo $row['BAOHANH']; ?> năm</p>
-                    <p style="text-align:center"><strong>Loại trang sức:</strong> <?php echo $row['TENLOAITS']; ?></p>
-                    <p style="text-align:center"><strong>Nhà cung cấp:</strong> <?php echo $row['NAME_NCC']; ?></p>
-                    <p style="text-align:center"><strong>Tình trạng:</strong> <?php echo $row['TINHTRANG']; ?></p>
-                    <br>
-                    <p><?php echo $row['MOTA']; ?></p>
-                    <br>
-                    <br>
-                    <form action="Xemchitiet.php" method="POST">
-                        <input type="hidden" name="product_id" value="$id_ts"> 
-                        <button type="submit">Thêm vào giỏ hàng</button>
-                    </form>
-                </div>
-                </div>
-                <?php
-            } else {
-                echo "Không tìm thấy sản phẩm.";
-            }
-            } else {
-            echo "Không có ID_TS được truyền vào.";
-            }
-
-            // Đóng kết nối cơ sở dữ liệu
-            $conn->close();
-            ?>
-        </div>
-    </div>
-<div class="footer">
-        <div class="container">
-            &copy; Công ty Pandora Việt Nam
-        </div>
-    </div>
-</body>
-</html>
-
+// Đóng kết nối cơ sở dữ liệu
+$conn->close();
+?>
+</div>
