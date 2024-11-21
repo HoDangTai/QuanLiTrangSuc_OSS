@@ -323,7 +323,7 @@ $result = mysqli_query($conn, $query);
                                 <li class="new-header-top-actions-cart">
                                     <a href="giohang.php">
                                         <i class="fas fa-shopping-cart"></i>
-                                        <span>0</span>
+                                        
                                     </a>
                                     <div class="popupCart"></div>
                                 </li>
