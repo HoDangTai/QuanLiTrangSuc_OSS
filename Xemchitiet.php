@@ -302,7 +302,6 @@ body {
 </style>
 
 </head>
-
 <body>
     <header id="new-header" class="stickystack">
         <div class="new-header-top">
@@ -514,70 +513,79 @@ body {
     </header>
     </div>
     <div class="container">
-    <div class="bd-example">
-        <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
-        <ol class="carousel-indicators">
-            <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
-            <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
-        </ol>
+        <div class="bd-example">
+            <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+                    <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+                </ol>
         
+            </div>
         </div>
-  </div>
-  <div>
-  <?php
-include "config.php";
+        <div>
+            <?php
+            include "config.php";
 
-if (isset($_GET['ID_TS'])) {
-  $id_ts= $_GET['ID_TS'];
+            if (isset($_GET['ID_TS'])) {
+            $id_ts= $_GET['ID_TS'];
 
-  $query = 'SELECT SANPHAM.*, LOAITRANGSUC.TENLOAITS, NCC.NAME_NCC 
-  FROM SANPHAM 
-  JOIN LOAITRANGSUC ON SANPHAM.ID_LOAITS = LOAITRANGSUC.ID_LOAITS 
-  JOIN NCC ON SANPHAM.ID_NCC = NCC.ID_NCC 
-  WHERE SANPHAM.ID_TS = ?';
-  $stmt = $conn->prepare($query);
-  $stmt->bind_param("s", $id_ts);
-  $stmt->execute();
-  $result = $stmt->get_result();
+            $query = 'SELECT SANPHAM.*, LOAITRANGSUC.TENLOAITS, NCC.NAME_NCC 
+            FROM SANPHAM 
+            JOIN LOAITRANGSUC ON SANPHAM.ID_LOAITS = LOAITRANGSUC.ID_LOAITS 
+            JOIN NCC ON SANPHAM.ID_NCC = NCC.ID_NCC 
+            WHERE SANPHAM.ID_TS = ?';
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("s", $id_ts);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-  if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    ?>
-    <div class="product-container">
-      <div class="product-image">
-      <br>
-      <br>
-      <img src="images/<?= $row['ANH']; ?>" width="550" height="550" >
-      </div>
-      <div class="product-info">
-        <br>
-        <br>
-        <h2 style="text-align:center"><?php echo $row['TENTS']; ?></h2>
-        <br>
-        <p class="gia"><?php echo $row['GIA']; ?> VNĐ</p>
-        <p style="text-align:center"><strong>Bảo hành:</strong> <?php echo $row['BAOHANH']; ?> năm</p>
-        <p style="text-align:center"><strong>Loại trang sức:</strong> <?php echo $row['TENLOAITS']; ?></p>
-        <p style="text-align:center"><strong>Nhà cung cấp:</strong> <?php echo $row['NAME_NCC']; ?></p>
-        <p style="text-align:center"><strong>Tình trạng:</strong> <?php echo $row['TINHTRANG']; ?></p>
-        <br>
-        <p><?php echo $row['MOTA']; ?></p>
-        <br>
-        <br>
-        <form action="Xemchitiet.php" method="POST">
-            <input type="hidden" name="product_id" value="$id_ts"> 
-            <button type="submit">Thêm vào giỏ hàng</button>
-        </form>
-      </div>
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                ?>
+                <div class="product-container">
+                <div class="product-image">
+                <br>
+                <br>
+                <img src="images/<?= $row['ANH']; ?>" width="550" height="550" >
+                </div>
+                <div class="product-info">
+                    <br>
+                    <br>
+                    <h2 style="text-align:center"><?php echo $row['TENTS']; ?></h2>
+                    <br>
+                    <p class="gia"><?php echo $row['GIA']; ?> VNĐ</p>
+                    <p style="text-align:center"><strong>Bảo hành:</strong> <?php echo $row['BAOHANH']; ?> năm</p>
+                    <p style="text-align:center"><strong>Loại trang sức:</strong> <?php echo $row['TENLOAITS']; ?></p>
+                    <p style="text-align:center"><strong>Nhà cung cấp:</strong> <?php echo $row['NAME_NCC']; ?></p>
+                    <p style="text-align:center"><strong>Tình trạng:</strong> <?php echo $row['TINHTRANG']; ?></p>
+                    <br>
+                    <p><?php echo $row['MOTA']; ?></p>
+                    <br>
+                    <br>
+                    <form action="Xemchitiet.php" method="POST">
+                        <input type="hidden" name="product_id" value="$id_ts"> 
+                        <button type="submit">Thêm vào giỏ hàng</button>
+                    </form>
+                </div>
+                </div>
+                <?php
+            } else {
+                echo "Không tìm thấy sản phẩm.";
+            }
+            } else {
+            echo "Không có ID_TS được truyền vào.";
+            }
+
+            // Đóng kết nối cơ sở dữ liệu
+            $conn->close();
+            ?>
+        </div>
     </div>
-    <?php
-  } else {
-    echo "Không tìm thấy sản phẩm.";
-  }
-} else {
-  echo "Không có ID_TS được truyền vào.";
-}
+<div class="footer">
+        <div class="container">
+            &copy; Công ty Pandora Việt Nam
+        </div>
+    </div>
+</body>
+</html>
 
-// Đóng kết nối cơ sở dữ liệu
-$conn->close();
-?>
-</div>

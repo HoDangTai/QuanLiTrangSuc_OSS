@@ -86,6 +86,13 @@ $result = mysqli_query($conn, $query);
         background-color: #333;
         color: pink;
     }
+	.footer {
+            background-color: #ffcccb;
+            color: #000;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+        }
 /*-------------------------------------*/
     .form-group {
         display: flex;
@@ -462,6 +469,11 @@ $result = mysqli_query($conn, $query);
                 echo "</div>";
             }
             ?>
+        </div>
+    </div>
+	<div class="footer">
+        <div class="container">
+            &copy; Công ty Pandora Việt Nam
         </div>
     </div>
 <?php
