@@ -8,16 +8,37 @@
     $update=false;
 
 	if (isset($_POST['add'])) {
-        $id_loaits=$_POST['id_loaits'];
-		$tenloaits=$_POST['tenloaits'];
-
-		$query = "INSERT INTO LOAITRANGSUC (ID_LOAITS, TENLOAITS) VALUES ( ?, ?)";
-		$stmt = $conn->prepare($query);
-		$stmt->bind_param("ss", $id_loaits, $tenloaits);
-		$stmt->execute();
-		header('location: loaits.php');
-		$_SESSION['response'] = "Successfully Inserted to the database!";
-		$_SESSION['res_type'] = "success";
+        if (isset($_POST['add'])) {
+			$id_loaits = $_POST['id_loaits'];
+			$tenloaits = $_POST['tenloaits'];
+		
+			// Kiểm tra xem ID_LOAITS đã tồn tại hay chưa
+			$query_check = "SELECT ID_LOAITS FROM LOAITRANGSUC WHERE ID_LOAITS = ?";
+			$stmt_check = $conn->prepare($query_check);
+			$stmt_check->bind_param("s", $id_loaits);
+			$stmt_check->execute();
+			$result_check = $stmt_check->get_result();
+		
+			if ($result_check->num_rows > 0) {
+				// Nếu ID_LOAITS đã tồn tại, thông báo lỗi
+				$_SESSION['response'] = "Error: Jewelry type ID already exists. Please use a unique ID!";
+				$_SESSION['res_type'] = "danger";
+				header('location: loaits.php');
+				exit();
+			}
+		
+			// Nếu không tồn tại, tiến hành thêm mới
+			$query = "INSERT INTO LOAITRANGSUC (ID_LOAITS, TENLOAITS) VALUES (?, ?)";
+			$stmt = $conn->prepare($query);
+			$stmt->bind_param("ss", $id_loaits, $tenloaits);
+			$stmt->execute();
+		
+			$_SESSION['response'] = "Added jewelry types successfully!";
+			$_SESSION['res_type'] = "success";
+			header('location: loaits.php');
+			exit();
+		}
+		
 	}
 
 	if (isset($_GET['delete'])) {
