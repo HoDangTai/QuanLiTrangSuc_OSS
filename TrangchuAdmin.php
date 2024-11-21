@@ -101,6 +101,14 @@ h2 {
     z-index: 999;
 
 }
+.footer {
+        border-top: 2px solid pink;
+        background-color: white;
+        color: #000;
+        text-align: center;
+        padding: 10px;
+        width: 100%;
+    }
 
         .nav-link:hover .nav-dropdown {
             display: block;
@@ -208,8 +216,6 @@ h2 {
                 </div>
             </nav>
         </header>
-        <div class="container">
-
             <br>
             <h2 style="text-align:center;  color: black">CHÀO MỪNG BẠN ĐẾN VỚI TRANG CHỦ CỦA QUẢN TRỊ</h2>
             <p style="text-align:center; color: black">Chúc bạn một ngày làm việc tốt lành</p>
@@ -259,6 +265,9 @@ h2 {
 </button>
 </div>
 
+    </div>
+    <div class="footer">
+        &copy; Công ty Pandora Việt Nam
     </div>
 </body>
 </html>
