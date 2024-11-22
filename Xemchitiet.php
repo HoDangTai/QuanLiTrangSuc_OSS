@@ -13,37 +13,64 @@
     $user_name = $_SESSION['user_name'];
     $user_type = $_SESSION['user_type'];
     $id_ts="";
+    $id_cus="";
     
-    // Thêm sản phẩm vào giỏ hàng
+    // Query to get ID_CUS from users_cus table using ID_USER
+    $query = 'SELECT ID_CUS FROM users_cus WHERE ID_USER = ?';
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('i', $user_id); // Use $user_id instead of $id_user
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $id_cus = $row['ID_CUS']; // Assign the fetched ID_CUS
+    } else {
+        echo "<script>alert('Customer ID not found. Please contact support.'); window.location.href='login.php';</script>";
+        exit();
+    }
+
     if (isset($_POST['add_to_cart'])) {
         $product_id = $_POST['product_id'];
-        $product_name = $_POST['product_name'];
-        $product_price = $_POST['product_price'];
-
-        // Tạo session lưu thông tin sản phẩm
-        if (!isset($_SESSION['cart'])) {
-            $_SESSION['cart'] = [];
-        }
-
-        // Kiểm tra sản phẩm có tồn tại trong giỏ hàng hay chưa
-        $is_existing = false;
-        foreach ($_SESSION['cart'] as &$item) {
-            if ($item['id'] == $product_id) {
-                $item['quantity'] += 1; // Tăng số lượng nếu đã có
-                $is_existing = true;
-                break;
+        $quantity = $_POST['quantity'];
+    
+        // Retrieve product price from database
+        $query = 'SELECT GIA FROM sanpham WHERE ID_TS = ?';
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('s', $product_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $product = $result->fetch_assoc();
+            $price = $product['GIA'];
+            $total_price = $price * $quantity;
+    
+            // Insert or update cart in the database
+            $check_query = 'SELECT * FROM giohang WHERE ID_CUS = ? AND ID_TS = ?';
+            $stmt = $conn->prepare($check_query);
+            $stmt->bind_param('ss', $user_id, $product_id);
+            $stmt->execute();
+            $check_result = $stmt->get_result();
+    
+            if ($check_result->num_rows > 0) {
+                // Update existing item in the cart
+                $update_query = 'UPDATE giohang SET SOLUONG = SOLUONG + ?, THANHTIEN = THANHTIEN + ? WHERE ID_CUS = ? AND ID_TS = ?';
+                $stmt = $conn->prepare($update_query);
+                $stmt->bind_param('ddss', $quantity, $total_price, $user_id, $product_id);
+                $stmt->execute();
+            } else {
+                // Insert new item into the cart
+                $insert_query = 'INSERT INTO giohang (ID_CUS, ID_TS, SOLUONG, THANHTIEN) VALUES (?, ?, ?, ?)';
+                $stmt = $conn->prepare($insert_query);
+                $stmt->bind_param('ssid', $id_cus, $product_id, $quantity, $total_price);
+                $stmt->execute();
             }
+    
+            echo "<script>alert('Product added to cart!'); window.location.href='giohang.php';</script>";
+        } else {
+            echo "<script>alert('Product not found!');</script>";
         }
-        if (!$is_existing) {
-            $_SESSION['cart'][] = [
-                'id' => $product_id,
-                'name' => $product_name,
-                'price' => $product_price,
-                'quantity' => 1
-            ];
-        }
-        header("Location: giohang.php"); // Chuyển hướng sau khi thêm vào giỏ hàng
-        exit();
     }
 ?>
     
@@ -289,18 +316,32 @@ body {
       margin-bottom: 10px;
     }
     .add-to-cart {
-  border: 1px solid #ff69b4;
-  background-color: white;
-  padding: 10px 240px; /* Thay đổi giá trị padding để làm rộng nút */
-  border-radius: 5px;
+  display: inline-block;
+  background-color: pink;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px 30px;
   text-align: center;
-  display: inline-block; /* Hiển thị trên một dòng ngang */
-  white-space: nowrap; /* Không ngắt dòng */
-
+  text-transform: uppercase;
+  border: none;
+  border-radius: 25px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  
 }
-    .add-to-cart:hover {
-        background-color: pink;
-    }
+
+.add-to-cart:hover {
+  background-color: #ff85c1;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.add-to-cart:active {
+  transform: translateY(1px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
     .gia {
   background-color: pink;
   padding: 10px 100px;
@@ -581,8 +622,12 @@ if ($id_ts) {
                     <input type="hidden" name="product_id" value="<?= htmlspecialchars($row['ID_TS']); ?>">
                     <input type="hidden" name="product_name" value="<?= htmlspecialchars($row['TENTS']); ?>">
                     <input type="hidden" name="product_price" value="<?= htmlspecialchars($row['GIA']); ?>">
-                    <button type="submit" name="add_to_cart" class="btn btn-primary">Thêm vào giỏ hàng</button>
+                    <label for="quantity" style="display: block; margin-bottom: 10px; font-weight: bold;">Số lượng:</label>
+                    <input type="number" name="quantity" id="quantity" value="1" min="1" style="padding: 8px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px;">
+                    <button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ hàng</button>
                 </form>
+
+                
             </div>
         </div>
         <?php
