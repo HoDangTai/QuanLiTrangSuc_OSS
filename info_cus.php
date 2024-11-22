@@ -264,7 +264,7 @@ h2 {
       </select>
           <br>
           <div class="form-group">
-            <input type="text" name="id_cus" value="<?= $id_cus; ?>" class="form-control" placeholder="Nhập ID khách hàng" required>
+            <input type="text" name="id_cus" value="<?= $id_cus; ?>" class="form-control" placeholder="Nhập ID khách hàng" <?php if ($id_cus) echo 'readonly'; ?> required>
           </div>
           <div class="form-group">
             <input type="text" name="first_name" value="<?= $first_name; ?>" class="form-control" placeholder="Nhập Tên" required>
@@ -275,8 +275,8 @@ h2 {
           <div class="form-group">
             <select name="gt" class="form-control" required>
               <option value="">Chọn giới tính</option>
-              <option value="Nam" <?php if ($gt == 'Nam') echo 'selected'; ?>>Nam</option>
-              <option value="Nữ" <?php if ($gt == 'Nữ') echo 'selected'; ?>>Nữ</option>
+              <option value="0" <?php if ($gt == 0) echo 'selected'; ?>>Nam</option>
+              <option value="1" <?php if ($gt == 1) echo 'selected'; ?>>Nữ</option>
             </select>
           </div>
           <div class="form-group">
@@ -290,7 +290,7 @@ h2 {
           </div>
           <div class="form-group">
             <?php if ($id == true) { ?>
-            <input type="submit" name="update" class="btn btn-success btn-block" value="Cập nhập">
+            <input type="submit" name="update" class="btn btn-success btn-block" value="Cập nhật">
             <?php } else { ?>
             <input type="submit" name="add" class="btn btn-primary btn-block" value="Thêm tài khoản">
             <?php } ?>
@@ -308,8 +308,7 @@ h2 {
         <div class="account-list">
         <table class="table table-hover" id="data-table">
         <thead>
-  <tr>
-    <th>#</th>
+  <tr class="text-center">
     <th>ID KH</th>
     <th>Họ</th>
     <th>Tên</th>
@@ -324,8 +323,7 @@ h2 {
   <?php while ($row = $result->fetch_assoc()) { 
     $gt = ($row['GioiTinh'] == 1) ? 'Nữ' : 'Nam';
   ?>
-  <tr>
-    <td><?= $row['ID_USER']; ?></td>
+  <tr class="text-center">
     <td><?= $row['ID_CUS']; ?></td>
     <td><?= $row['FIRSTNAME_CUS']; ?></td>
     <td><?= $row['LASTNAME_CUS']; ?></td>
@@ -334,9 +332,9 @@ h2 {
     <td><?= $row['ADDRESS_CUS']; ?></td>
     <td><?= $row['PHONE_CUS']; ?></td>
     <td>
-      <a href="details_cus.php?details=<?= $row['ID_USER']; ?>" class="badge badge-primary p-2">Xem chi tiết</a> |
-      <a href="action_cus.php?delete=<?= $row['ID_USER']; ?>" class="badge badge-danger p-2" onclick="return confirm('Bạn có chắc là muốn xóa?');">Xóa</a> |
-      <a href="info_cus.php?edit=<?= $row['ID_USER']; ?>" class="badge badge-success p-2">Chỉnh sửa</a>
+      <a href="details_cus.php?details=<?= $row['ID_CUS']; ?>" class="badge badge-primary p-2">Xem chi tiết</a> |
+      <a href="action_cus.php?delete=<?= $row['ID_CUS']; ?>" class="badge badge-danger p-2" onclick="return confirm('Bạn có chắc là muốn xóa?');">Xóa</a> |
+      <a href="info_cus.php?edit=<?= $row['ID_CUS']; ?>" class="badge badge-success p-2">Chỉnh sửa</a>
     </td>
   </tr>
   <?php } ?>
