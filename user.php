@@ -5,8 +5,23 @@ $password = "";
 $dbname = "qlts";
 $conn = new mysqli($servername, $username, $password, $dbname);
 mysqli_set_charset($conn, 'utf8');
-$query = "SELECT * FROM sanpham WHERE ID_LOAITS = 'C01'";
+$query = 'SELECT * FROM sanpham';
 $result = mysqli_query($conn, $query);
+?>
+<?php
+    session_start();
+
+    // Check if the user is logged in
+    if (!isset($_SESSION['user_id'])) {
+        // Redirect to the login page if not logged in
+        header('location: login.php');
+        exit();
+    }
+
+    // Access user information from the session
+    $user_id = $_SESSION['user_id'];
+    $user_name = $_SESSION['user_name'];
+    $user_type = $_SESSION['user_type'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +29,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charm</title>
+    <title>Trang Chủ Pandora</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -86,13 +101,16 @@ $result = mysqli_query($conn, $query);
         background-color: #333;
         color: pink;
     }
-	    .footer {
-            background-color: #ffcccb;
-            color: #000;
-            text-align: center;
-            padding: 10px 0;
-            width: 100%;
-        }
+
+    .footer {
+        background-color: #ffcccb;
+        color: #000;
+        text-align: center;
+        padding: 10px 0;
+        width: 100%;
+    }
+
+    
 /*-------------------------------------*/
     .form-group {
         display: flex;
@@ -168,6 +186,10 @@ $result = mysqli_query($conn, $query);
         align-items: center; /* Canh giữa các phần tử con theo chiều dọc */
     }
     
+.new-header-top-actions-account {
+    padding-left: 10px; /* Thụt vào phải 10px, bạn có thể điều chỉnh giá trị này theo ý muốn */
+}
+
     .new-header-menu-list {
     list-style: none;
     padding: 0;
@@ -225,50 +247,60 @@ $result = mysqli_query($conn, $query);
         text-decoration: none;
         color: black;
     }
-    /*----------------------------*/
-    .new-collection-head-bg {
-        position: relative;
-        overflow: hidden; /* Đảm bảo không bị tràn khỏi container */
-        border: 10px solid #ffcad4; /* Màu hồng và độ rộng 20px */
-        box-sizing: border-box; /* Đảm bảo kích thước tính cả border */
+    /*-------------------------------------------------------------- */
+    .new-index-item2-wrap {
+            padding: 20px;
+        }
+    .new-index-item2-item {
+        margin-bottom: 20px;
     }
 
-    .new-collection-head-bg img {
+    .new-index-item2-item img {
         width: 100%;
         height: auto;
-        display: block;
     }
 
-    .items-heading {
-        position: absolute;
-        top: 50%;
-        left: 100px;
-        transform: translateY(-50%);
+    .new-index-item2-item .content {
+        background-color: white;
         color: black;
-        font-size: 50px; /* Điều chỉnh kích thước chữ theo mong muốn */
-        margin: 0;
-        z-index: 1; /* Đảm bảo tiêu đề hiển thị trên ảnh */
+        text-align: center;
+        padding: 10px;
+        position: relative;
     }
 
-    .section-title {
-        position: absolute;
-        top: 30%;
-        left: 180px;
-        transform: translate(-50%);
-        color: black; /* Màu trắng với độ mờ */
-        font-size: 20px; /* Kích thước nhỏ hơn */
-        margin: 0;
-        z-index: 1;
-        text-decoration: none; /* Loại bỏ gạch chân của liên kết */
+    .new-index-item2-item .content span {
+        text-decoration: underline pink;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 5px;
+    }
+    /*-------------------------------------------------------------- */
+    .new-index-item1-wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        flex-direction: row;
     }
 
-    .section-title span {
-        cursor: pointer; /* Biến đổi con trỏ thành "pointer" khi di chuột vào */
-        transition: color 0.3s ease; /* Hiệu ứng màu chuyển động trong 0.3 giây */
+    .new-index-item1-item {
+        text-align: center;
+        margin: 0 15px;
     }
 
-    .section-title span:hover {
-        color: #ffcccb; /* Đổi màu khi hover */
+    .new-index-item1-item img {
+        width: 130px;
+        height: 130px;
+    }
+    @media (max-width: 768px) {
+    .new-index-item1-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+        }
+    }
+    .new-index-item1-item .card-body span {
+        text-decoration: underline pink;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 5px;
     }
 
     </style>
@@ -285,8 +317,7 @@ $result = mysqli_query($conn, $query);
                         </a>
                     </div>
                     <div class="new-header-top-actions">
-                        <div class="new-header-search">
-                            <form action="/search">
+                            <form action="search.php" method="GET">
                                 <input type="hidden" name="type" value="product">
                                 <div class="form-group search-input-wrap">
                                     <input type="text" class="form-control js-search-input" name="q" placeholder="Tìm sản phẩm..." autocomplete="off" required>
@@ -297,18 +328,16 @@ $result = mysqli_query($conn, $query);
                                     </div>
                                 </div> 
                             </form>
-                            <a href="#" class="new-header-search-ovl">
-                            </a>
-                        </div>
                         <div class="new-header-top-actions-list">
                             <ul>
                                 <li class="new-header-top-actions-account">
-                                    <a href="login.php">
+                                    <a href="information_details.php">
                                         <i class="fas fa-user"></i>
+                                        <span><?php echo $_SESSION['user_name'] ?></span>
                                     </a>
                                 </li>
                                 <li class="new-header-top-actions-cart">
-                                    <a href="#">
+                                    <a href="giohang.php">
                                         <i class="fas fa-shopping-cart"></i>
                                         
                                     </a>
@@ -325,82 +354,82 @@ $result = mysqli_query($conn, $query);
                 <div class="new-header-menu">
                     <ul class="new-header-menu-list">
                         <li class="new-header-menu-list-item has-child">
-                        <a href="#">
+                        <a href="/collections/new-collection">
                             <span>Bộ sưu tập mới</span>
                         </a>
                             <div class="new-header-menu-mega">
                                 <ul class="new-header-menu-mega-list"> 
                                     <li class="new-header-menu-mega-item">
-                                        <a href="#">
+                                        <a href="/">
                                             <span>Bộ sưu tập</span>								
                                         </a>									
                                         <ul class="new-header-menu-mega-sub">								
-                                            <li><a href="#">New Arrivals</a></li>										
-                                            <li><a href="#">Pandora Moments</a></li>										
+                                            <li><a href="/collections/new-collection">New Arrivals</a></li>										
+                                            <li><a href="/collections/pandora-moments">Pandora Moments</a></li>										
                                         </ul>
                                     </li>
                                     <li class="new-header-menu-mega-item">
-                                        <a href="#">
+                                        <a href="/">
                                             <span>Chủ đề</span>							
                                         </a>
                                         <ul class="new-header-menu-mega-sub">
-                                            <li><a href="#">Gia đình</a></li>									
-                                            <li><a href="#">Tình yêu</a></li>									
+                                            <li><a href="/collections/gia-dinh">Gia đình</a></li>									
+                                            <li><a href="/collections/tinh-yeu">Tình yêu</a></li>									
                                         </ul>
                                     </li>
                                     <li class="new-header-menu-mega-item">
-                                        <a href="#">
+                                        <a href="/collections/cung-hoang-dao">
                                             <span>Theo Cung - mệnh</span>
                                         </a>
                                         <ul class="new-header-menu-mega-sub">
-                                            <li><a href="#">Cung Hoàng đạo</a></li>
+                                            <li><a href="/collections/cung-hoang-dao-1">Cung Hoàng đạo</a></li>
                                         </ul>
                                     </li>
                                 </ul>
                             </div>
                         </li>
                         <li class="new-header-menu-list-item has-child">
-                            <a href="#">
+                            <a href="/collections/trang-suc">
                                 <span>Trang sức</span>
                             </a>                           
                             <div class="new-header-menu-mega">
                                 <ul class="new-header-menu-mega-list">                                    
                                     <li class="new-header-menu-mega-item">
-                                        <a href="#">
+                                        <a href="/collections/charms">
                                             <span>Charms</span>                                           
                                         </a>                                        
                                         <ul class="new-header-menu-mega-sub">
-                                            <li><a href="#">Tất cả</a></li>                                            
-                                            <li><a href="#">Charm chặn</a></li>
+                                            <li><a href="/collections/charms">Tất cả</a></li>                                            
+                                            <li><a href="/collections/charm-chan">Charm chặn</a></li>
                                         </ul>
                                     </li>
                                     <li class="new-header-menu-mega-item">
-                                        <a href="#">
+                                        <a href="/collections/vongtaypandora">
                                             <span>Vòng</span>
                                         </a>
                                         <ul class="new-header-menu-mega-sub">
-                                            <li><a href="#">Tất cả</a></li>
-                                            <li><a href="#">Vòng mềm</a></li>
+                                            <li><a href="/collections/vongtaypandora">Tất cả</a></li>
+                                            <li><a href="/collections/vong-mem">Vòng mềm</a></li>
                                         </ul>
                                     </li>
                                     <li class="new-header-menu-mega-item">
-                                        <a href="#">
+                                        <a href="/collections/day-chuyen-1">
                                             <span>Dây Chuyền</span>
                                         </a>
                                         <ul class="new-header-menu-mega-sub">
-                                            <li><a href="#">Tất cả</a></li>
-                                            <li><a href="#">Dây chuyền</a></li>
+                                            <li><a href="/collections/day-chuyen-1">Tất cả</a></li>
+                                            <li><a href="/collections/day-chuyen-1">Dây chuyền</a></li>
                                         </ul>
                                     </li>
                                     <li class="new-header-menu-mega-item">
-                                        <a href="#">
+                                        <a href="/collections/hoataipandora">
                                             <span>Hoa Tai</span>
                                         </a>
                                         <ul class="new-header-menu-mega-sub">
-                                            <li><a href="#">Tất cả</a></li>
-                                            <li><a href="#">Kiểu tròn</a></li>
-                                            <li><a href="#">Bông tai nụ</a></li>
-                                            <li><a href="#">Kiểu rơi</a></li>
+                                            <li><a href="/collections/hoataipandora">Tất cả</a></li>
+                                            <li><a href="/collections/kieu-tron">Kiểu tròn</a></li>
+                                            <li><a href="/collections/bong-tai-nu">Bông tai nụ</a></li>
+                                            <li><a href="/collections/kieu-roi">Kiểu rơi</a></li>
                                         </ul>
                                     </li>
                                     <li class="new-header-menu-mega-item">
@@ -433,11 +462,11 @@ $result = mysqli_query($conn, $query);
                                             </li>
                                             <li><a href="/collections/charms">Charms</a></li>
                                             <li><a href="/collections/vong-pandora-moments">Vòng</a></li>
-                                            <li><a href="/collections/phu-kien-pandora">Phụ kiện</a></li>
+                                            <li><a href="#">Phụ kiện</a></li>
                                         </ul>
                                     </li>
                                     <li class="new-header-menu-mega-item">
-                                        <a href="/collections/pandora-reflexions">
+                                        <a href="#">
                                             <span>Pandora Reflexions</span>
                                         </a>
                                     </li>
@@ -450,14 +479,107 @@ $result = mysqli_query($conn, $query);
         </div>
     </header>
     </div>
-    <div class="new-collection-head-bg">
-        <img class="dt-width-100" src="./images/bg-charm.jpg" alt="Charm Image">
-        <a href="index.php" class="section-title">
-                <span>Trang chủ</span> / Charms
-            </a>
-        <h2 class="items-heading">Charms</h2>
+    <div class="new-index-item1-wrap">
+    <div class="new-index-item1-left">
+        <h3>
+            XEM NGAY BỘ SƯU TẬP MỚI 
+        </h3>
     </div>
+    <div class="new-index-item1-right">
+        <div class="new-index-item1-list d-flex flex-wrap justify-content-around">
+            <div class="new-index-item1-item">
+                <div class="card">
+                    <a href="https://pandora.norbreeze.vn/collections/new-collection">
+                        <img class="card-img-top" src="./images/hangmoive.jpg" alt="">
+                        <div class="card-body">
+                            <span>HÀNG MỚI VỀ</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="new-index-item1-item">
+                <div class="card">
+                    <a href="charm.php">
+                        <img class="card-img-top" src="./images/charm.jpg" alt="">
+                        <div class="card-body">
+                            <span>CHARM</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="new-index-item1-item">
+                <div class="card">
+                    <a href="vongtay.php">
+                        <img class="card-img-top" src="./images/vongtay.jpg" alt="">
+                        <div class="card-body">
+                            <span>VÒNG TAY</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="new-index-item1-item">
+                <div class="card">
+                    <a href="nhan.php">
+                        <img class="card-img-top" src="./images/nhan.jpg" alt="">
+                        <div class="card-body">
+                            <span>NHẪN</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="new-index-item1-item">
+                <div class="card">
+                    <a href="hoatai.php">
+                        <img class="card-img-top" src="./images/hoatai.jpg" alt="">
+                        <div class="card-body">
+                            <span>HOA TAI</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="new-index-item1-item">
+                <div class="card">
+                    <a href="daychuyen.php">
+                        <img class="card-img-top" src="./images/daychuyen.jpg" alt="">
+                        <div class="card-body">
+                            <span>DÂY CHUYỀN</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="container">
+    <div class="bd-example">
+        <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+            <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+        </ol>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+            <img src="./images/bg1.webp" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item">
+            <img src="./images/bg2.webp" class="d-block w-100" alt="...">
+            </div>
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+        </div>
+        </div>
         <div class="products">
 		<?php
             while ($row = mysqli_fetch_assoc($result)) {
@@ -471,7 +593,83 @@ $result = mysqli_query($conn, $query);
             ?>
         </div>
     </div>
-	<div class="footer">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="new-index-item2-left row">
+                <div class="new-index-item2-item col-md-4">
+                    <div class="card">
+                        <img class="card-img-top img-responsive ls-is-cached lazyloaded" src="./images/ba.jpg" alt="">
+                        <div class="card-body">
+                            <div class="content">
+                                <span>BÀ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="new-index-item2-item col-md-4">
+                    <div class="card">
+                        <img class="card-img-top img-responsive ls-is-cached lazyloaded" src="./images/banbe.jpg" alt="">
+                        <div class="card-body">
+                            <div class="content">
+                                <span>BẠN BÈ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="new-index-item2-item col-md-4">
+                    <div class="card">
+                        <img class="card-img-top img-responsive ls-is-cached lazyloaded" src="./images/chiemgai.jpg" alt="">
+                        <div class="card-body">
+                            <div class="content">
+                                <span>CHỊ EM GÁI</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="new-index-item2-item col-md-4">
+                    <div class="card">
+                        <img class="card-img-top img-responsive ls-is-cached lazyloaded" src="./images/congai.jpg" alt="">
+                        <div class="card-body">
+                            <div class="content">
+                                <span>CON GÁI</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="new-index-item2-item col-md-4">
+                    <div class="card">
+                        <img class="card-img-top img-responsive ls-is-cached lazyloaded" src="./images/me.jpg" alt="">
+                        <div class="card-body">
+                            <div class="content">
+                                <span>MẸ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="new-index-item2-item col-md-4">
+                    <div class="card">
+                        <img class="card-img-top img-responsive ls-is-cached lazyloaded" src="./images/nguoiyeu.jpg" alt="">
+                        <div class="card-body">
+                            <div class="content">
+                                <span>NGƯỜI YÊU</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="new-index-item2-right text-center d-flex align-items-center justify-content-center h-100">
+                <div class="card-body">
+                    <h3 class="card-title">Quà yêu tôn vinh phái đẹp</h3>
+                    <div class="new-index-item2-action">
+                        <a href="https://pandora.norbreeze.vn/collections/trang-suc" class="details-button">XEM THÊM</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
         <div class="container">
             &copy; Công ty Pandora Việt Nam
         </div>

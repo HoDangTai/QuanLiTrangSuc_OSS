@@ -1,13 +1,108 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "qlts";
-$conn = new mysqli($servername, $username, $password, $dbname);
-mysqli_set_charset($conn, 'utf8');
-$query = 'SELECT * FROM sanpham';
-$result = mysqli_query($conn, $query);
+require 'config.php';
+session_start();
 
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    // Redirect to the login page if not logged in
+    header('location: login.php');
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+$id_cus='';
+
+    // Query to get ID_CUS from users_cus table using ID_USER
+    $query = 'SELECT ID_CUS FROM users_cus WHERE ID_USER = ?';
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('i', $user_id); // Use $user_id instead of $id_user
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $id_cus = $row['ID_CUS']; // Assign the fetched ID_CUS
+    } else {
+        echo "<script>alert('Customer ID not found. Please contact support.'); window.location.href='login.php';</script>";
+        exit();
+    }
+// Add to cart function
+if (isset($_POST['add_to_cart'])) {
+    $product_id = $_POST['product_id'];
+    $quantity = $_POST['quantity'];
+
+    // Retrieve product price from database
+    $query = 'SELECT GIA FROM sanpham WHERE ID_TS = ?';
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('s', $product_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $product = $result->fetch_assoc();
+    $price = $product['GIA'];
+
+    $total_price = $price * $quantity;
+
+    // Insert or update the cart in the database
+    $check_query = 'SELECT * FROM giohang WHERE ID_CUS = ? AND ID_TS = ?';
+    $stmt = $conn->prepare($check_query);
+    $stmt->bind_param('ss', $user_id, $product_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Update existing cart item
+        $update_query = 'UPDATE giohang SET SOLUONG = SOLUONG + ?, THANHTIEN = THANHTIEN + ? WHERE ID_CUS = ? AND ID_TS = ?';
+        $stmt = $conn->prepare($update_query);
+        $stmt->bind_param('ddss', $quantity, $total_price, $user_id, $product_id);
+        $stmt->execute();
+    } else {
+        // Insert new cart item
+        $insert_query = 'INSERT INTO giohang (ID_CUS, ID_TS, SOLUONG, THANHTIEN) VALUES (?, ?, ?, ?)';
+        $stmt = $conn->prepare($insert_query);
+        $stmt->bind_param('ssid', $user_id, $product_id, $quantity, $total_price);
+        $stmt->execute();
+    }
+
+    echo "<script>alert('Product added to cart!');</script>";
+}
+// Update cart quantity
+if (isset($_POST['update_cart'])) {
+    $product_id = $_POST['product_id'];
+    $quantity = $_POST['quantity'];
+
+    // Retrieve product price
+    $query = 'SELECT GIA FROM sanpham WHERE ID_TS = ?';
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('s', $product_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $product = $result->fetch_assoc();
+    $price = $product['GIA'];
+
+    $total_price = $price * $quantity;
+
+    // Update quantity and total price
+    $update_query = 'UPDATE giohang SET SOLUONG = ?, THANHTIEN = ? WHERE ID_CUS = ? AND ID_TS = ?';
+    $stmt = $conn->prepare($update_query);
+    $stmt->bind_param('idss', $quantity, $total_price, $id_cus, $product_id);
+    $stmt->execute();
+
+    echo "<script>alert('Giỏ hàng đã được cập nhật!'); window.location.href='giohang.php';</script>";
+}
+
+// Remove from cart
+if (isset($_POST['remove_from_cart'])) {
+    $product_id = $_POST['product_id'];
+
+    $delete_query = 'DELETE FROM giohang WHERE ID_CUS = ? AND ID_TS = ?';
+    $stmt = $conn->prepare($delete_query);
+    $stmt->bind_param('ss', $id_cus, $product_id);
+    $stmt->execute();
+
+    echo "<script>alert('Sản phẩm đã được xóa khỏi giỏ hàng!'); window.location.href='giohang.php';</script>";
+}
+
+    
 
 ?>
 
@@ -286,7 +381,71 @@ $result = mysqli_query($conn, $query);
             text-decoration-thickness: 2px;
             text-underline-offset: 5px;
         }
+        .cart-container {
+            margin: 20px auto;
+            max-width: 900px;
+        }
 
+        .cart-header {
+            background-color: #ffcccb;
+            padding: 15px;
+            border-radius: 5px;
+            color: white;
+            text-align: center;
+        }
+
+        .cart-table {
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .cart-table th, 
+        .cart-table td {
+            vertical-align: middle;
+        }
+
+        .update-btn, .remove-btn {
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .update-btn {
+            background-color: #17a2b8;
+        }
+
+        .update-btn:hover {
+            background-color: #138496;
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+        }
+
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+
+        .total-container {
+            text-align: right;
+            padding: 20px 0;
+        }
+
+        .footer {
+            background-color: #ffcccb;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            font-size: 16px;
+        }
     </style>
 </head>
 
@@ -323,7 +482,7 @@ $result = mysqli_query($conn, $query);
                                     </a>
                                 </li>
                                 <li class="new-header-top-actions-cart">
-                                    <a href="#">
+                                    <a href="giohang.php">
                                         <i class="fas fa-shopping-cart"></i>
                                         <span>0</span>
                                     </a>
@@ -468,10 +627,91 @@ $result = mysqli_query($conn, $query);
             </div>
         </div>
     </header>
-    <div class="container">
-        <h3>Giỏ hàng của bạn</h3>
-        <p>hiện tại giỏ hàng không có sản phẩm nào</p>
+  
+        <?php
+        // Display Cart Items
+        $query = 'SELECT g.ID_TS, p.TENTS, g.SOLUONG, g.THANHTIEN FROM giohang g JOIN sanpham p ON g.ID_TS = p.ID_TS WHERE g.ID_CUS = ?';
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('s', $id_cus);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // Calculate total cart value
+        $total_query = 'SELECT SUM(THANHTIEN) as total FROM giohang WHERE ID_CUS = ?';
+        $stmt = $conn->prepare($total_query);
+        $stmt->bind_param('s', $id_cus);
+        $stmt->execute();
+        $total_result = $stmt->get_result();
+        $total_row = $total_result->fetch_assoc();
+        $total_cart_value = $total_row['total'];
+        ?>
+
+    <div class="container cart-container">
+        <div class="cart-header">
+            <h1>Giỏ Hàng Của Bạn</h1>
+        </div>
+
+        <?php if ($result->num_rows > 0): ?>
+            <table class="table table-striped cart-table">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Sản Phẩm</th>
+                        <th>Số Lượng</th>
+                        <th>Thành Tiền</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    $counter = 1;
+                    while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $counter++; ?></td>
+                        <td>
+                            <strong><?php echo $row['TENTS']; ?></strong>
+                        </td>
+                        <td>
+                            <form method="post" action="" class="d-flex">
+                                <input type="hidden" name="product_id" value="<?php echo $row['ID_TS']; ?>">
+                                <input type="number" name="quantity" class="form-control w-50 me-2" value="<?php echo $row['SOLUONG']; ?>" min="1">
+                                <button type="submit" name="update_cart" class="btn update-btn">Cập Nhật</button>
+                            </form>
+                        </td>
+                        <td><?php echo number_format($row['THANHTIEN']); ?> VNĐ</td>
+                        <td>
+                            <form method="post" action="">
+                                <input type="hidden" name="product_id" value="<?php echo $row['ID_TS']; ?>">
+                                <button type="submit" name="remove_from_cart" class="btn remove-btn">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+
+            <div class="total-container">
+                <h3>Tổng Giá Trị: <span class="text-danger"><?php echo number_format($total_cart_value); ?> VNĐ</span></h3>
+            </div>
+
+            <div class="text-center">
+                <a href="user.php" class="btn btn-secondary">Tiếp Tục Mua Sắm</a>
+                <a href="checkout.php" class="btn btn-primary">Thanh Toán</a>
+            </div>
+
+        <?php else: ?>
+            <div class="alert alert-warning text-center mt-4">
+                <strong>Giỏ hàng của bạn đang trống!</strong>
+            </div>
+            <div class="text-center">
+                <a href="user.php" class="btn btn-success">Bắt Đầu Mua Sắm</a>
+            </div>
+        <?php endif; ?>
     </div>
+
+
+
+
 </div>
     <div class="footer">
         <div class="container">

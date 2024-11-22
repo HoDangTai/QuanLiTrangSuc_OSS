@@ -13,15 +13,19 @@
     $user_name = $_SESSION['user_name'];
     $user_type = $_SESSION['user_type'];
 ?>
+<?php
+  include 'action_dep.php';
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>General</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <title>Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" >
+    <script src='main.js'></script>
     <style>
         * {
             margin: 0;
@@ -30,7 +34,10 @@
         }
 
         body {
-            height: 100vh;
+            width: 100%;
+             height: 100%;
+             margin: 0;
+                 padding: 0;
             background-color: white;
         }
 
@@ -101,14 +108,6 @@ h2 {
     z-index: 999;
 
 }
-.footer {
-        border-top: 2px solid pink;
-        background-color: white;
-        color: #000;
-        text-align: center;
-        padding: 10px;
-        width: 100%;
-    }
 
         .nav-link:hover .nav-dropdown {
             display: block;
@@ -125,6 +124,14 @@ h2 {
             position: relative;
         }
 
+    
+        .compact-tbody {
+    font-size: 14px;
+}
+
+.compact-tbody td, .compact-tbody th {
+    padding: 0.5rem;
+}
         a:hover {
             color: #00bfff;
         }
@@ -142,10 +149,6 @@ h2 {
             height: 1px;
             transition: all 0.3s;
         }
-
-        /* a:hover::before {
-            width: 100%;
-        } */
         .action a {
         color: black; /* Đổi màu chữ thành màu đen */
         margin-top: 50px; /* Tăng khoảng cách lề trên lên 50px */
@@ -155,15 +158,16 @@ h2 {
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <nav>
+            <header class="header">
+                <nav>
                 <div class="left-section">
-                    <img src="images/images/logo.jpg" href="TrangchuAdmin.php"width="100px" height="70" alt="logo">
-                    <!-- <h1>Logo</h1> -->
-                </div>
+        <a href="TrangchuAdmin.php">
+        <img src="images/images/logo.jpg" href="/QLTS/TrangchuAdmin.php"width="100px" height="70" alt="logo">
+        </a>
+    </div>
                 <div class="right-section">
                     <ul class="nav-links">
-                        <li class="nav-link">
+                    <li class="nav-link">
                             <a href="#" style="color: black">Tài khoản user</a>
                             <div class="nav-dropdown">
                                 <div class="nav-dropdown-item">
@@ -205,7 +209,6 @@ h2 {
                         <li class="nav-link">
                             <a href="order.php" style="color: black">Quản lý đơn hàng</a>
                         </li>
-                
                     </ul>
                     <div class="action">
                     <a href="information_details_admin.php">
@@ -216,58 +219,13 @@ h2 {
                 </div>
             </nav>
         </header>
-            <br>
-            <h2 style="text-align:center;  color: black">CHÀO MỪNG BẠN ĐẾN VỚI TRANG CHỦ CỦA QUẢN TRỊ</h2>
-            <p style="text-align:center; color: black">Chúc bạn một ngày làm việc tốt lành</p>
-            <br>
-
-<!-- Carousel -->
-<div id="demo" class="carousel slide" data-bs-ride="carousel">
-
-<!-- Indicators/dots -->
-<div class="carousel-indicators">
-  <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-  <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-  <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
-</div>
-
-<!-- The slideshow/carousel -->
-<div class="carousel-inner">
-  <div class="carousel-item active">
-    <img src="images/images/slider1.jpg" alt="Los Angeles" class="d-block" style="width:100% ; height: 450px;">
-    <div class="carousel-caption">
-      <h3>Chi nhánh mới</h3>
-      <p>Thông báo mở chi nhánh Pandora mới tại Nha Trang</p>
+        <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 mt-3 bg-info p-4 rounded">
+        <h2 class="bg-light p-2 rounded text-center text-dark">ID: <?= $vid; ?></h2>
+        <h4 class="text-light">Tên phòng ban : <?= $vtenphongban; ?></h4>
+      </div>
     </div>
   </div>
-  <div class="carousel-item">
-    <img src="images/images/slider2.jpg" alt="Chicago" class="d-block" style="width:100% ; height: 450px;">
-    <div class="carousel-caption">
-      <h3>Bộ sưu tập mới</h3>
-      <p>Bộ sưu tập trang sức Đông Xuân Pandora mới sắp được công bố</p>
-    </div> 
-  </div>
-  <div class="carousel-item">
-    <img src="images/images/slider3.jpg" alt="New York" class="d-block" style="width:100%; height: 450px;" >
-    <div class="carousel-caption">
-      <h3>Khuyến mại 25/12</h3>
-      <p>Nhân dịp Noel sắp tới công ty đang chuẩn bị lên kế hoạch cho việc khuyến mãi các sản phẩm</p>
-    </div>  
-  </div>
-</div>
-
-<!-- Left and right controls/icons -->
-<button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
-  <span class="carousel-control-prev-icon"></span>
-</button>
-<button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
-  <span class="carousel-control-next-icon"></span>
-</button>
-</div>
-
-    </div>
-    <div class="footer">
-        &copy; Công ty Pandora Việt Nam
-    </div>
-</body>
+    </body>
 </html>

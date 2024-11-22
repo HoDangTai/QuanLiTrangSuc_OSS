@@ -11,14 +11,29 @@
 		if (isset($_POST['id_dep']) && isset($_POST['tenphongban'])) {
 			$id_dep = $_POST['id_dep'];
 			$tenphongban = $_POST['tenphongban'];
-	
-			$query = "INSERT INTO DEPARTMENT (ID_DEP, NAME_DEP) VALUES (?, ?)";
-			$stmt = $conn->prepare($query);
-			$stmt->bind_param("ss", $id_dep, $tenphongban);
-			$stmt->execute();
-	
-			$_SESSION['response'] = "Successfully Inserted to the database!";
-			$_SESSION['res_type'] = "success";
+
+			// Kiểm tra xem ID_DEP đã tồn tại hay chưa
+			$checkQuery = "SELECT * FROM DEPARTMENT WHERE ID_DEP = ?";
+			$stmtCheck = $conn->prepare($checkQuery);
+			$stmtCheck->bind_param("s", $id_dep);
+			$stmtCheck->execute();
+			$result = $stmtCheck->get_result();
+
+			if ($result->num_rows > 0) {
+				// Nếu ID_DEP đã tồn tại
+				$_SESSION['response'] = "Error: ID already exists. Please use a unique ID!";
+				$_SESSION['res_type'] = "danger";
+			} else {
+				// Nếu ID_DEP chưa tồn tại, thêm mới vào cơ sở dữ liệu
+				$query = "INSERT INTO DEPARTMENT (ID_DEP, NAME_DEP) VALUES (?, ?)";
+				$stmt = $conn->prepare($query);
+				$stmt->bind_param("ss", $id_dep, $tenphongban);
+				$stmt->execute();
+
+				$_SESSION['response'] = "Successfully Inserted to the database!";
+				$_SESSION['res_type'] = "success";
+			}
+			// Quay về trang department.php
 			header('location: department.php');
 			exit();
 		} else {

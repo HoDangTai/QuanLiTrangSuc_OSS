@@ -11,19 +11,40 @@
     $update=false;
 
 	if (isset($_POST['add'])) {
-        $id=$_POST['id'];
-		$tenncc=$_POST['tenncc'];
-		$emailncc=$_POST['emailncc'];
-        $addncc=$_POST['addncc'];
-		$phonencc=$_POST['phonencc'];
-
-		$query = "INSERT INTO NCC (ID_NCC, NAME_NCC, EMAIL_NCC, ADDRESS_NCC, PHONE_NCC ) VALUES (?, ?, ?, ?, ?)";
-		$stmt = $conn->prepare($query);
-		$stmt->bind_param("sssss", $id, $tenncc, $emailncc, $addncc, $phonencc);
-		$stmt->execute();
-		header('location: NCC.php');
-		$_SESSION['response'] = "Successfully Inserted to the database!";
-		$_SESSION['res_type'] = "success";
+        if (isset($_POST['add'])) {
+			$id = $_POST['id'];
+			$tenncc = $_POST['tenncc'];
+			$emailncc = $_POST['emailncc'];
+			$addncc = $_POST['addncc'];
+			$phonencc = $_POST['phonencc'];
+		
+			// Kiểm tra xem ID_NCC đã tồn tại hay chưa
+			$query_check = "SELECT ID_NCC FROM NCC WHERE ID_NCC = ?";
+			$stmt_check = $conn->prepare($query_check);
+			$stmt_check->bind_param("s", $id);
+			$stmt_check->execute();
+			$result_check = $stmt_check->get_result();
+		
+			if ($result_check->num_rows > 0) {
+				// Nếu ID_NCC đã tồn tại, thông báo lỗi
+				$_SESSION['response'] = "Error: Supplier ID already exists. Please use a unique ID!";
+				$_SESSION['res_type'] = "danger";
+				header('location: NCC.php');
+				exit();
+			}
+		
+			// Nếu không tồn tại, thêm mới vào bảng NCC
+			$query = "INSERT INTO NCC (ID_NCC, NAME_NCC, EMAIL_NCC, ADDRESS_NCC, PHONE_NCC) VALUES (?, ?, ?, ?, ?)";
+			$stmt = $conn->prepare($query);
+			$stmt->bind_param("sssss", $id, $tenncc, $emailncc, $addncc, $phonencc);
+			$stmt->execute();
+		
+			$_SESSION['response'] = "Added supplier successfully!";
+			$_SESSION['res_type'] = "success";
+			header('location: NCC.php');
+			exit();
+		}
+		
 	}
 
 	if (isset($_GET['delete'])) {

@@ -1,6 +1,6 @@
 <?php
     session_start();
-
+    require 'config.php';
     // Check if the user is logged in
     if (!isset($_SESSION['user_id'])) {
         // Redirect to the login page if not logged in
@@ -13,23 +13,64 @@
     $user_name = $_SESSION['user_name'];
     $user_type = $_SESSION['user_type'];
     $id_ts="";
+    $id_cus="";
     
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
+    // Query to get ID_CUS from users_cus table using ID_USER
+    $query = 'SELECT ID_CUS FROM users_cus WHERE ID_USER = ?';
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('i', $user_id); // Use $user_id instead of $id_user
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $id_cus = $row['ID_CUS']; // Assign the fetched ID_CUS
+    } else {
+        echo "<script>alert('Customer ID not found. Please contact support.'); window.location.href='login.php';</script>";
+        exit();
     }
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_id'])) {
+    if (isset($_POST['add_to_cart'])) {
         $product_id = $_POST['product_id'];
-        $quantity = 1; // Số lượng mặc định là 1 khi thêm vào giỏ hàng
-
-        // Kiểm tra nếu sản phẩm đã có trong giỏ hàng
-        if (isset($_SESSION['cart'][$product_id])) {
-            $_SESSION['cart'][$product_id] += $quantity;
+        $quantity = $_POST['quantity'];
+    
+        // Retrieve product price from database
+        $query = 'SELECT GIA FROM sanpham WHERE ID_TS = ?';
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('s', $product_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $product = $result->fetch_assoc();
+            $price = $product['GIA'];
+            $total_price = $price * $quantity;
+    
+            // Insert or update cart in the database
+            $check_query = 'SELECT * FROM giohang WHERE ID_CUS = ? AND ID_TS = ?';
+            $stmt = $conn->prepare($check_query);
+            $stmt->bind_param('ss', $user_id, $product_id);
+            $stmt->execute();
+            $check_result = $stmt->get_result();
+    
+            if ($check_result->num_rows > 0) {
+                // Update existing item in the cart
+                $update_query = 'UPDATE giohang SET SOLUONG = SOLUONG + ?, THANHTIEN = THANHTIEN + ? WHERE ID_CUS = ? AND ID_TS = ?';
+                $stmt = $conn->prepare($update_query);
+                $stmt->bind_param('ddss', $quantity, $total_price, $user_id, $product_id);
+                $stmt->execute();
+            } else {
+                // Insert new item into the cart
+                $insert_query = 'INSERT INTO giohang (ID_CUS, ID_TS, SOLUONG, THANHTIEN) VALUES (?, ?, ?, ?)';
+                $stmt = $conn->prepare($insert_query);
+                $stmt->bind_param('ssid', $id_cus, $product_id, $quantity, $total_price);
+                $stmt->execute();
+            }
+    
+            echo "<script>alert('Product added to cart!'); window.location.href='giohang.php';</script>";
         } else {
-            $_SESSION['cart'][$product_id] = $quantity;
+            echo "<script>alert('Product not found!');</script>";
         }
-
-        echo "Sản phẩm đã được thêm vào giỏ hàng!";
     }
 ?>
     
@@ -275,18 +316,32 @@ body {
       margin-bottom: 10px;
     }
     .add-to-cart {
-  border: 1px solid #ff69b4;
-  background-color: white;
-  padding: 10px 240px; /* Thay đổi giá trị padding để làm rộng nút */
-  border-radius: 5px;
+  display: inline-block;
+  background-color: pink;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px 30px;
   text-align: center;
-  display: inline-block; /* Hiển thị trên một dòng ngang */
-  white-space: nowrap; /* Không ngắt dòng */
-
+  text-transform: uppercase;
+  border: none;
+  border-radius: 25px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  
 }
-    .add-to-cart:hover {
-        background-color: pink;
-    }
+
+.add-to-cart:hover {
+  background-color: #ff85c1;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.add-to-cart:active {
+  transform: translateY(1px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
     .gia {
   background-color: pink;
   padding: 10px 100px;
@@ -302,6 +357,7 @@ body {
 </style>
 
 </head>
+
 <body>
     <header id="new-header" class="stickystack">
         <div class="new-header-top">
@@ -513,79 +569,76 @@ body {
     </header>
     </div>
     <div class="container">
-        <div class="bd-example">
-            <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
-                <ol class="carousel-indicators">
-                    <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
-                    <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
-                </ol>
+    <div class="bd-example">
+        <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+            <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+        </ol>
         
+        </div>
+  </div>
+  <div>
+  <?php
+include "config.php"; // Đảm bảo file config kết nối thành công
+
+// Kiểm tra và nhận giá trị ID_TS từ URL
+$id_ts = isset($_GET['ID_TS']) ? trim($_GET['ID_TS']) : null;
+
+if ($id_ts) {
+    // Truy vấn chi tiết sản phẩm
+    $query = 'SELECT SANPHAM.*, LOAITRANGSUC.TENLOAITS, NCC.NAME_NCC 
+              FROM SANPHAM 
+              JOIN LOAITRANGSUC ON SANPHAM.ID_LOAITS = LOAITRANGSUC.ID_LOAITS 
+              JOIN NCC ON SANPHAM.ID_NCC = NCC.ID_NCC 
+              WHERE SANPHAM.ID_TS = ?';
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $id_ts);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Kiểm tra kết quả
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        ?>
+        <div class="product-container">
+            <div class="product-image">
+                <br><br>
+                <img src="images/<?= htmlspecialchars($row['ANH']); ?>" width="550" height="550">
+            </div>
+            <div class="product-info">
+                <br><br>
+                <h2 style="text-align:center"><?= htmlspecialchars($row['TENTS']); ?></h2>
+                <br>
+                <p class="gia"><?= htmlspecialchars($row['GIA']); ?> VNĐ</p>
+                <p style="text-align:center"><strong>Bảo hành:</strong> <?= htmlspecialchars($row['BAOHANH']); ?> năm</p>
+                <p style="text-align:center"><strong>Loại trang sức:</strong> <?= htmlspecialchars($row['TENLOAITS']); ?></p>
+                <p style="text-align:center"><strong>Nhà cung cấp:</strong> <?= htmlspecialchars($row['NAME_NCC']); ?></p>
+                <p style="text-align:center"><strong>Tình trạng:</strong> <?= htmlspecialchars($row['TINHTRANG']); ?></p>
+                <br>
+                <p><?= nl2br(htmlspecialchars($row['MOTA'])); ?></p>
+                <br><br>
+                <form method="post" action="">
+                    <input type="hidden" name="product_id" value="<?= htmlspecialchars($row['ID_TS']); ?>">
+                    <input type="hidden" name="product_name" value="<?= htmlspecialchars($row['TENTS']); ?>">
+                    <input type="hidden" name="product_price" value="<?= htmlspecialchars($row['GIA']); ?>">
+                    <label for="quantity" style="display: block; margin-bottom: 10px; font-weight: bold;">Số lượng:</label>
+                    <input type="number" name="quantity" id="quantity" value="1" min="1" style="padding: 8px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px;">
+                    <button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ hàng</button>
+                </form>
+
+                
             </div>
         </div>
-        <div>
-            <?php
-            include "config.php";
+        <?php
+    } else {
+        echo "Không tìm thấy sản phẩm.";
+    }
+} else {
+    echo "Không có ID_TS được truyền vào.";
+}
 
-            if (isset($_GET['ID_TS'])) {
-            $id_ts= $_GET['ID_TS'];
-
-            $query = 'SELECT SANPHAM.*, LOAITRANGSUC.TENLOAITS, NCC.NAME_NCC 
-            FROM SANPHAM 
-            JOIN LOAITRANGSUC ON SANPHAM.ID_LOAITS = LOAITRANGSUC.ID_LOAITS 
-            JOIN NCC ON SANPHAM.ID_NCC = NCC.ID_NCC 
-            WHERE SANPHAM.ID_TS = ?';
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("s", $id_ts);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
-                $row = $result->fetch_assoc();
-                ?>
-                <div class="product-container">
-                <div class="product-image">
-                <br>
-                <br>
-                <img src="images/<?= $row['ANH']; ?>" width="550" height="550" >
-                </div>
-                <div class="product-info">
-                    <br>
-                    <br>
-                    <h2 style="text-align:center"><?php echo $row['TENTS']; ?></h2>
-                    <br>
-                    <p class="gia"><?php echo $row['GIA']; ?> VNĐ</p>
-                    <p style="text-align:center"><strong>Bảo hành:</strong> <?php echo $row['BAOHANH']; ?> năm</p>
-                    <p style="text-align:center"><strong>Loại trang sức:</strong> <?php echo $row['TENLOAITS']; ?></p>
-                    <p style="text-align:center"><strong>Nhà cung cấp:</strong> <?php echo $row['NAME_NCC']; ?></p>
-                    <p style="text-align:center"><strong>Tình trạng:</strong> <?php echo $row['TINHTRANG']; ?></p>
-                    <br>
-                    <p><?php echo $row['MOTA']; ?></p>
-                    <br>
-                    <br>
-                    <form action="Xemchitiet.php" method="POST">
-                        <input type="hidden" name="product_id" value="$id_ts"> 
-                        <button type="submit">Thêm vào giỏ hàng</button>
-                    </form>
-                </div>
-                </div>
-                <?php
-            } else {
-                echo "Không tìm thấy sản phẩm.";
-            }
-            } else {
-            echo "Không có ID_TS được truyền vào.";
-            }
-
-            // Đóng kết nối cơ sở dữ liệu
-            $conn->close();
-            ?>
-        </div>
-    </div>
-<div class="footer">
-        <div class="container">
-            &copy; Công ty Pandora Việt Nam
-        </div>
-    </div>
-</body>
-</html>
-
+// Đóng kết nối cơ sở dữ liệu
+$conn->close();
+?>
+</div>
