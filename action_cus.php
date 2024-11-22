@@ -25,33 +25,52 @@
         $phone_cus =$_POST['phone_cus'];
     
 
-		$query = "INSERT INTO USERS_CUS ( ID_CUS, ID_USER, FIRSTNAME_CUS, LASTNAME_CUS, GioiTinh, EMAIL_CUS, ADDRESS_CUS, PHONE_CUS ) VALUES (?, ? , ?, ?, ?, ?, ?, ?)";
-		$stmt = $conn->prepare($query);
-		$stmt->bind_param("ssssssss", $id_cus, $id, $first_name,  $last_name, $gt , $email_cus, $add_cus, $phone_cus );
-		$stmt->execute();
-		header('location: info_cus.php');
-		$_SESSION['response'] = "Successfully Inserted to the database!";
-		$_SESSION['res_type'] = "success";
+		// Kiểm tra ID_CUS đã tồn tại hay chưa
+        $query_check_cus = "SELECT ID_CUS FROM USERS_CUS WHERE ID_CUS=?";
+        $stmt_check_cus = $conn->prepare($query_check_cus);
+        $stmt_check_cus->bind_param("s", $id_cus);
+        $stmt_check_cus->execute();
+        $result_check_cus = $stmt_check_cus->get_result();
+    
+        if ($result_check_cus->num_rows > 0) {
+            // Nếu ID_CUS đã tồn tại, thông báo lỗi
+            $_SESSION['response'] = "Error: Customer ID already exists. Please use a unique ID!";
+            $_SESSION['res_type'] = "danger";
+            header('location: info_cus.php');
+            exit();
+        }
 
         // Kiểm tra tính hợp lệ của giá trị ID_USER
-$query_check_user = "SELECT ID_USER FROM USERS WHERE ID_USER=?";
-$stmt_check_user = $conn->prepare($query_check_user);
-$stmt_check_user->bind_param("s", $id);
-$stmt_check_user->execute();
-$result_check_user = $stmt_check_user->get_result();
-$row_check_user = $result_check_user->fetch_assoc();
-if (!$row_check_user) {
-  echo "Giá trị ID_USER không hợp lệ!";
-  exit;
-}
-	}
+        $query_check_user = "SELECT ID_USER FROM USERS WHERE ID_USER=?";
+        $stmt_check_user = $conn->prepare($query_check_user);
+        $stmt_check_user->bind_param("s", $id);
+        $stmt_check_user->execute();
+        $result_check_user = $stmt_check_user->get_result();
+        $row_check_user = $result_check_user->fetch_assoc();
+        if (!$row_check_user) {
+        echo "ID_USER value is invalid!";
+        exit;
+        }
+
+        // Thêm khách hàng nếu các kiểm tra trên hợp lệ
+        $query = "INSERT INTO USERS_CUS (ID_CUS, ID_USER, FIRSTNAME_CUS, LASTNAME_CUS, GioiTinh, EMAIL_CUS, ADDRESS_CUS, PHONE_CUS) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ssssssss", $id_cus, $id, $first_name, $last_name, $gt, $email_cus, $add_cus, $phone_cus);
+        $stmt->execute();
+
+        $_SESSION['response'] = "Added customers successfully!";
+        $_SESSION['res_type'] = "success";
+        header('location: info_cus.php');
+        exit();
+        }
 
 	if (isset($_GET['delete'])) {
 		$id = $_GET['delete'];
 
-		$query = "DELETE FROM USERS_CUS WHERE ID_USER=?";
+		$query = "DELETE FROM USERS_CUS WHERE ID_CUS=?";
 		$stmt = $conn->prepare($query);
-		$stmt->bind_param("i", $id);
+		$stmt->bind_param("s", $id);
 		$stmt->execute();
 
 		header('location: info_cus.php');
@@ -62,9 +81,9 @@ if (!$row_check_user) {
 	if (isset($_GET['edit'])) {
 		$id = $_GET['edit'];
 
-		$query = "SELECT * FROM USERS_CUS WHERE ID_USER=?";
+		$query = "SELECT * FROM USERS_CUS WHERE ID_CUS=?";
 		$stmt = $conn->prepare($query);
-		$stmt->bind_param("i", $id);
+		$stmt->bind_param("s", $id);
 		$stmt->execute();
 		$result = $stmt->get_result();
 		$row = $result->fetch_assoc();
@@ -91,9 +110,9 @@ if (!$row_check_user) {
         $phone_cus =$_POST['phone_cus'];
       
         // Kiểm tra xem dữ liệu mới có khác với dữ liệu cũ không
-        $query_check = "SELECT * FROM USERS_CUS WHERE ID_USER=?";
+        $query_check = "SELECT * FROM USERS_CUS WHERE ID_CUS=?";
         $stmt_check = $conn->prepare($query_check);
-        $stmt_check->bind_param("i", $id);
+        $stmt_check->bind_param("s", $id);
         $stmt_check->execute();
         $result_check = $stmt_check->get_result();
         $row_check = $result_check->fetch_assoc();
@@ -119,11 +138,11 @@ if (!$row_check_user) {
         }
       
         // Tiếp tục thực hiện câu truy vấn UPDATE
-        $query = "UPDATE USERS_CUS SET ID_CUS=?, FIRSTNAME_CUS=?, LASTNAME_CUS=? 
-        , GioiTinh=?, EMAIL_CUS=?, ADDRESS_CUS=?, PHONE_CUS=? WHERE ID_USER=?";
+        $query = "UPDATE USERS_CUS SET FIRSTNAME_CUS=?, LASTNAME_CUS=? 
+        , GioiTinh=?, EMAIL_CUS=?, ADDRESS_CUS=?, PHONE_CUS=? WHERE ID_CUS=?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("sssssssi", $id_cus, $first_name, $last_name,$gt ,
-        $email_cus,$add_cus,$phone_cus, $id);
+        $stmt->bind_param("ssissss",  $first_name, $last_name,$gt ,
+        $email_cus,$add_cus,$phone_cus, $id_cus);
         $stmt->execute();
       
         $_SESSION['response'] = "Updated Successfully!";
@@ -133,9 +152,9 @@ if (!$row_check_user) {
 
 	if (isset($_GET['details'])) {
 		$id = $_GET['details'];
-		$query = "SELECT * FROM USERS_CUS WHERE ID_USER=?";
+		$query = "SELECT * FROM USERS_CUS WHERE ID_CUS=?";
 		$stmt = $conn->prepare($query);
-		$stmt->bind_param("i", $id);
+		$stmt->bind_param("s", $id);
 		$stmt->execute();
 		$result = $stmt->get_result();
 		$row = $result->fetch_assoc();
