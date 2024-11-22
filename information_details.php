@@ -395,7 +395,7 @@
                                     </a>
                                 </li>
                                 <li class="new-header-top-actions-cart">
-                                    <a href="#">
+                                    <a href="giohang.php">
                                         <i class="fas fa-shopping-cart"></i>
                                     </a>
                                     <div class="popupCart"></div>
