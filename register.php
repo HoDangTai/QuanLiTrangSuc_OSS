@@ -7,26 +7,30 @@ if(isset($_POST['register'])){
    $name = mysqli_real_escape_string($conn, $_POST['name']);
    $email = mysqli_real_escape_string($conn, $_POST['email']);
    $pass = mysqli_real_escape_string($conn,($_POST['password']));
-   $cpass = mysqli_real_escape_string($conn,($_POST['password']));
+   $cpass = mysqli_real_escape_string($conn,($_POST['cpassword']));
    $type_user = $_POST['type_user'];
 
-   $select = " SELECT * FROM users WHERE EMAIL = '$email' && PASS = '$pass'";
+   $select = " SELECT * FROM users WHERE EMAIL = '$email' OR NAME = '$name'";
 
    $result = mysqli_query($conn, $select);
 
    if(mysqli_num_rows($result) > 0){
 
-      $error[] = 'Tài khoản đã tồn tại!';
+      $error[] = 'Tài khoản hoặc email đã tồn tại!';
 
    }else{
 
-      if($pass != $cpass){
-         $error[] = 'Mật khẩu không trùng khớp!';
-      }else{
-        $insert = "INSERT INTO users(NAME, EMAIL, PASS, TYPE_USER) VALUES('$name','$email','$pass','$type_user')";
-        mysqli_query($conn, $insert);
-        header('location: login.php');
-      }
+        if (strlen($pass) <= 6) {
+            $error[] = 'Mật khẩu phải dài hơn 6 ký tự!';
+        } elseif ($pass != $cpass) {
+            $error[] = 'Mật khẩu không trùng khớp!';
+        } else {
+            // Mã hóa mật khẩu trước khi lưu
+            $hashed_pass = password_hash($pass, PASSWORD_BCRYPT);
+            $insert = "INSERT INTO users(NAME, EMAIL, PASS, TYPE_USER) VALUES('$name', '$email', '$hashed_pass', '$type_user')";
+            mysqli_query($conn, $insert);
+            header('location: login.php');
+        }
    }
 
 };
@@ -56,11 +60,16 @@ if(isset($_POST['register'])){
             align-items: center;
             margin-top: 15px;
         }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
         .footer {
             background-color: #ffcccb;
             color: #000;
             text-align: center;
-            padding: 10px 0;
             width: 100%;
         }
         .logo {
@@ -149,7 +158,7 @@ if(isset($_POST['register'])){
 <body>
     <div class="header">
         <div class="logo">
-            <a href="/">
+            <a href="index.php">
                 <img class="dt-width-auto" width="170" height="35"
                     src="https://file.hstatic.net/200000103143/file/pandora_acf7bd54e6534a07be748b51c51c637c.svg"
                     alt="Pandora Việt Nam" />
@@ -162,7 +171,7 @@ if(isset($_POST['register'])){
         <?php
             if(isset($error)){
                 foreach($error as $error){
-                    echo '<span class="error-msg">'.$error.'</span>';
+                    echo '<span style="color:red;">'.$error.'</span>';
                 };
             };
         ?>
