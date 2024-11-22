@@ -275,8 +275,8 @@ h2 {
           <div class="form-group">
             <select name="gt" class="form-control" required>
               <option value="">Chọn giới tính</option>
-              <option value="Nam" <?php if ($gt == 'Nam') echo 'selected'; ?>>Nam</option>
-              <option value="Nữ" <?php if ($gt == 'Nữ') echo 'selected'; ?>>Nữ</option>
+              <option value="Nam" <?php if ($gt == '0') echo 'selected'; ?>>Nam</option>
+              <option value="Nữ" <?php if ($gt == '1') echo 'selected'; ?>>Nữ</option>
             </select>
           </div>
           <div class="form-group">

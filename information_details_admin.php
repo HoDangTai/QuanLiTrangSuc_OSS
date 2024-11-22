@@ -5,16 +5,16 @@
     if ($conn->connect_error) {
         die("Kết nối thất bại: " . $conn->connect_error);
     }
-    $name="";
-    $email="";
-    $address="";
+
+    $name = $gt = $email = $phone = $address = "";
+
     $error="";
     session_start();
     if (isset($_SESSION['user_id'])) {
         // Lấy thông tin người dùng từ cơ sở dữ liệu
         $user_id = $_SESSION['user_id'];
 
-        $sql = "SELECT * FROM USERS_EMPLOYEER WHERE ID_USER = ?";
+        $sql = "SELECT * FROM USERS_CUS WHERE ID_USER = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -23,12 +23,13 @@
         if ($result->num_rows > 0) {
             // Hiển thị thông tin người dùng
             $row = $result->fetch_assoc();
-            $name = $row["FIRSTNAME_EMP"] . " " . $row["LASTNAME_EMP"];
-            $email = $row["EMAIL_EMP"];
-            $phone = $row["PHONE_EMP"];
-            $address = $row["ADDRESS_EMP"];
+            $name = $row["FIRSTNAME_CUS"] . " " . $row["LASTNAME_CUS"];
+            $email = $row["EMAIL_CUS"];
+            $phone = $row["PHONE_CUS"];
+            $gt = $row["GioiTinh"];
+            $address = $row["ADDRESS_CUS"];
         } else {
-            // echo $error = "Không tìm thấy thông tin người dùng";
+            echo $error = "Không tìm thấy thông tin người dùng";
         }
     } else {
         // Người dùng chưa đăng nhập, thực hiện các hành động khác (ví dụ: chuyển hướng đến trang đăng nhập)
@@ -52,7 +53,134 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
         body {
+            height: 100vh;
+            background-color: white;
+        }
+
+        .container {
+    /* background: url(images/Pandora-logo-history.jpg) center no-repeat; */
+    margin-top: 5rem;
+    height: 100%;
+    background-size: cover;
+}
+h2 {
+    margin-top: 2rem; /* Thêm khoảng cách 2rem cho phần tử h2 bên dưới header */
+}
+
+.header {
+    height: 5rem;
+    display: grid;
+    background: white;
+    background-size: cover;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    border-bottom: 2px solid pink;
+}
+
+        nav {
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            color: #fff;
+            margin: auto;
+        }
+
+        .left-section img {
+            width: 140px;
+            cursor: pointer;
+            position: relative;
+            left: -100%;
+        }
+
+        .right-section {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            list-style: none;
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+        }
+        .nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: pink;
+    padding: 10px;
+    display: none;
+    z-index: 999;
+
+}
+.footer {
+        border-top: 2px solid pink;
+        background-color: white;
+        color: #000;
+        text-align: center;
+        padding: 10px;
+        width: 100%;
+    }
+
+        .nav-link:hover .nav-dropdown {
+            display: block;
+        }
+
+        .nav-dropdown-item {
+            padding: 5px 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: 600;
+            position: relative;
+        }
+
+        a:hover {
+            color: #00bfff;
+        }
+
+        a::before {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -5px;
+            margin: auto;
+            width: 0%;
+            content: '';
+            color: transparent;
+            background: linear-gradient(45deg, #e1d5f5, #63a9fe);
+            height: 1px;
+            transition: all 0.3s;
+        }
+
+        /* a:hover::before {
+            width: 100%;
+        } */
+        .action a {
+        color: black; /* Đổi màu chữ thành màu đen */
+        margin-top: 50px; /* Tăng khoảng cách lề trên lên 50px */
+        }
+        /* body {
             font-family: 'Montserrat', sans-serif !important;
             background-color: #fff;
             margin: 0;
@@ -356,190 +484,72 @@
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
-        }
+        } */
     </style>
 </head>
 <body>
-    <header id="new-header" class="stickystack">
-        <div class="new-header-top">
-            <div class="new-container">
-                <div class="new-header-top-wrap"> 
-                    <div class="new-header-top-logo">
-                        <a href="/">
-                            <img class="dt-width-auto" width="170" height="35" src="https://file.hstatic.net/200000103143/file/pandora_acf7bd54e6534a07be748b51c51c637c.svg" alt="Pandora Việt Nam"/>
-                        </a>
-                    </div>
-                    <div class="new-header-top-actions">
-                        <div class="new-header-search">
-                            <form action="/search">
-                                <input type="hidden" name="type" value="product">
-                                <div class="form-group search-input-wrap">
-                                    <input type="text" class="form-control js-search-input" name="q" placeholder="Tìm sản phẩm..." autocomplete="off" required>
-                                    <button type="submit" class="btn">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                    <div class="search-suggest">
-                                    </div>
-                                </div> 
-                            </form>
-                            <a href="#" class="new-header-search-ovl">
-                            </a>
-                        </div>
-                        <div class="new-header-top-actions-list">
-                        
-                            <ul>
-                                <li class="new-header-top-actions-account">
-                                    <a href="information_details.php">
-                                        <i class="fas fa-user"></i>
-                                    </a>
-                                </li>
-                                <li class="new-header-top-actions-cart">
-                                    <a href="#">
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </a>
-                                    <div class="popupCart"></div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+<header class="header">
+            <nav>
+                <div class="left-section">
+                    <img src="images/images/logo.jpg" href="TrangchuAdmin.php"width="100px" height="70" alt="logo">
+                    <!-- <h1>Logo</h1> -->
                 </div>
-            </div>
-        </div>
-        <div class="new-header-bottom">
-            <div class="new-container">
-                <div class="new-header-menu">
-                    <ul class="new-header-menu-list">
-                        
-                        <li class="new-header-menu-list-item ">
-                            <a href="/collections/khuyen-mai">
-                                <span>KHUYẾN MÃI</span>
-                            </a>
-                        </li>
-                        <li class="new-header-menu-list-item has-child">
-                        <a href="/collections/new-collection">
-                            <span>Bộ sưu tập mới</span>
-                        </a>
-                            <div class="new-header-menu-mega">
-                                <ul class="new-header-menu-mega-list"> 
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/">
-                                            <span>Bộ sưu tập</span>								
-                                        </a>									
-                                        <ul class="new-header-menu-mega-sub">								
-                                            <li><a href="/collections/new-collection">New Arrivals</a></li>										
-                                            <li><a href="/collections/pandora-moments">Pandora Moments</a></li>										
-                                        </ul>
-                                    </li>
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/">
-                                            <span>Chủ đề</span>							
-                                        </a>
-                                        <ul class="new-header-menu-mega-sub">
-                                            <li><a href="/collections/gia-dinh">Gia đình</a></li>									
-                                            <li><a href="/collections/tinh-yeu">Tình yêu</a></li>									
-                                        </ul>
-                                    </li>
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/collections/cung-hoang-dao">
-                                            <span>Theo Cung - mệnh</span>
-                                        </a>
-                                        <ul class="new-header-menu-mega-sub">
-                                            <li><a href="/collections/cung-hoang-dao-1">Cung Hoàng đạo</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                <div class="right-section">
+                    <ul class="nav-links">
+                        <li class="nav-link">
+                            <a href="#" style="color: black">Tài khoản user</a>
+                            <div class="nav-dropdown">
+                                <div class="nav-dropdown-item">
+                                    <a href="general1.php">General</a>
+                                </div>
+                                <div class="nav-dropdown-item">
+                                    <a href="info_cus.php">Thông tin khách hàng</a>
+                                </div>
                             </div>
                         </li>
-                        <li class="new-header-menu-list-item has-child">
-                            <a href="/collections/trang-suc">
-                                <span>Trang sức</span>
-                            </a>                           
-                            <div class="new-header-menu-mega">
-                                <ul class="new-header-menu-mega-list">                                    
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/collections/charms">
-                                            <span>Charms</span>                                           
-                                        </a>                                        
-                                        <ul class="new-header-menu-mega-sub">
-                                            <li><a href="/collections/charms">Tất cả</a></li>                                            
-                                            <li><a href="/collections/charm-chan">Charm chặn</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/collections/vongtaypandora">
-                                            <span>Vòng</span>
-                                        </a>
-                                        <ul class="new-header-menu-mega-sub">
-                                            <li><a href="/collections/vongtaypandora">Tất cả</a></li>
-                                            <li><a href="/collections/vong-mem">Vòng mềm</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/collections/day-chuyen-1">
-                                            <span>Dây Chuyền</span>
-                                        </a>
-                                        <ul class="new-header-menu-mega-sub">
-                                            <li><a href="/collections/day-chuyen-1">Tất cả</a></li>
-                                            <li><a href="/collections/day-chuyen-1">Dây chuyền</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/collections/hoataipandora">
-                                            <span>Hoa Tai</span>
-                                        </a>
-                                        <ul class="new-header-menu-mega-sub">
-                                            <li><a href="/collections/hoataipandora">Tất cả</a></li>
-                                            <li><a href="/collections/kieu-tron">Kiểu tròn</a></li>
-                                            <li><a href="/collections/bong-tai-nu">Bông tai nụ</a></li>
-                                            <li><a href="/collections/kieu-roi">Kiểu rơi</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/collections/nhan-pandora">
-                                            <span>Nhẫn</span>
-                                        </a>
-                                        <ul class="new-header-menu-mega-sub">
-                                            <li><a href="/collections/nhan-pandora">Tất cả</a></li>
-                                            <li><a href="/collections/nhan-bac">Nhẫn bạc</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                        <li class="nav-link">
+                            <a href="#" style="color: black">Sản phẩm</a>
+                            <div class="nav-dropdown">
+                            <div class="nav-dropdown-item">
+                                    <a href="loaits.php">Loại trang sức</a>
+                                </div>
+                                <div class="nav-dropdown-item">
+                                    <a href="sanpham.php">Danh sách sản phẩm</a>
+                              </div>
+                                <div class="nav-dropdown-item">
+                                    <a href="NCC.php">Nhà cung cấp</a>
+                                </div>
                             </div>
                         </li>
-                        <li class="new-header-menu-list-item has-child">
-                            <a href="/collections/charms-va-vong">
-                                <span>Vòng & Charm</span>
-                            </a>
-                            <div class="new-header-menu-mega">
-                                <ul class="new-header-menu-mega-list"> 
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/collections/pandora-moments">
-                                            <span>Pandora Moments</span>
-                                        </a>
-                                        <ul class="new-header-menu-mega-sub">
-                                            <li class="back-menu">
-                                                <a href="#">
-                                                    <span>Pandora Moments</span>
-                                                </a>
-                                            </li>
-                                            <li><a href="/collections/charms">Charms</a></li>
-                                            <li><a href="/collections/vong-pandora-moments">Vòng</a></li>
-                                            <li><a href="/collections/phu-kien-pandora">Phụ kiện</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="new-header-menu-mega-item">
-                                        <a href="/collections/pandora-reflexions">
-                                            <span>Pandora Reflexions</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>	
-                        </li>	
+                        <li class="nav-link">
+                            <a href="#" style="color: black">Quản lý nhân sự</a>
+                            <div class="nav-dropdown">
+                            <div class="nav-dropdown-item">
+                                    <a href="department.php">Phòng ban</a>
+                                </div>
+                                <div class="nav-dropdown-item">
+                                    <a href="position.php">Vị trí</a>
+                              </div>
+                                <div class="nav-dropdown-item">
+                                    <a href="info_NV.php">Thông tin nhân viên</a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="nav-link">
+                            <a href="order.php" style="color: black">Quản lý đơn hàng</a>
+                        </li>
+                
                     </ul>
+                    <div class="action">
+                    <a href="information_details_admin.php">
+                        <i class="fas fa-user"></i>
+                        <span><?php echo $_SESSION['user_name'] ?></span>
+                    </a>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </header>
+            </nav>
+        </header>
+    <br>
     <div class="profile">
         <div align="center" class="title_account">
             <h2>THÔNG TIN TÀI KHOẢN</h2>
@@ -551,6 +561,13 @@
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" value="<?php echo $email; ?>" required>
 
+            <label for="name">Giới tính:</label>
+            <select name="gt" class="form-control" required>
+              <option value="">Chọn giới tính</option>
+              <option value="0" <?php echo ($gt == 0) ? 'selected' : ''; ?>>Nam</option>
+              <option value="1" <?php echo ($gt == 1) ? 'selected' : '';?>>Nữ</option>
+            </select>
+
             <label for="phone">Số điện thoại:</label>
             <input type="number" id="phone" name="phone" value="<?php echo $phone; ?>">
 
@@ -558,7 +575,6 @@
             <input id="address" name="address" value="<?php echo $address; ?>">
             <label><?php echo $error; ?></label>
             <div align="center">
-                <a href="update.php" class="btn">Cập nhật</a>
                 <a href="logout.php" class="btn">Đăng xuất</a>
             </div>
         </form>

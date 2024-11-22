@@ -6,6 +6,8 @@
         die("Kết nối thất bại: " . $conn->connect_error);
     }
 
+    $name = $gt = $email = $phone = $address = "";
+
     $error="";
     session_start();
     if (isset($_SESSION['user_id'])) {
@@ -24,6 +26,7 @@
             $name = $row["FIRSTNAME_CUS"] . " " . $row["LASTNAME_CUS"];
             $email = $row["EMAIL_CUS"];
             $phone = $row["PHONE_CUS"];
+            $gt = $row["GioiTinh"];
             $address = $row["ADDRESS_CUS"];
         } else {
             echo $error = "Không tìm thấy thông tin người dùng";
@@ -548,6 +551,13 @@
 
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" value="<?php echo $email; ?>" required>
+
+            <label for="name">Giới tính:</label>
+            <select name="gt" class="form-control" required>
+              <option value="">Chọn giới tính</option>
+              <option value="0" <?php echo ($gt == 0) ? 'selected' : ''; ?>>Nam</option>
+              <option value="1" <?php echo ($gt == 1) ? 'selected' : '';?>>Nữ</option>
+            </select>
 
             <label for="phone">Số điện thoại:</label>
             <input type="number" id="phone" name="phone" value="<?php echo $phone; ?>">
