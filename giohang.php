@@ -1,12 +1,30 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "qlts";
-$conn = new mysqli($servername, $username, $password, $dbname);
-mysqli_set_charset($conn, 'utf8');
-$query = 'SELECT * FROM sanpham';
-$result = mysqli_query($conn, $query);
+require 'config.php';
+ob_start();
+
+session_start();
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['update'])) {
+        $key = $_POST['update'];
+        if (isset($_POST['quantity'][$key]) && is_numeric($_POST['quantity'][$key])) {
+            $_SESSION['cart'][$key]['quantity'] = (int)$_POST['quantity'][$key];
+        }
+    }
+
+    if (isset($_POST['remove'])) {
+        $key = $_POST['remove'];
+        if (isset($_SESSION['cart'][$key])) {
+            unset($_SESSION['cart'][$key]);
+        }
+    }
+
+    header("Location: giohang.php");
+    exit();
+}
+
+ob_end_flush(); // Kết thúc bộ đệm đầu ra
+
+
 
 
 ?>
@@ -323,9 +341,9 @@ $result = mysqli_query($conn, $query);
                                     </a>
                                 </li>
                                 <li class="new-header-top-actions-cart">
-                                    <a href="#">
+                                    <a href="giohang.php">
                                         <i class="fas fa-shopping-cart"></i>
-                                        <span>0</span>
+                                        
                                     </a>
                                     <div class="popupCart"></div>
                                 </li>
@@ -468,10 +486,46 @@ $result = mysqli_query($conn, $query);
             </div>
         </div>
     </header>
-    <div class="container">
-        <h3>Giỏ hàng của bạn</h3>
-        <p>hiện tại giỏ hàng không có sản phẩm nào</p>
-    </div>
+    <?php
+
+        if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
+            echo "<p>Giỏ hàng trống!</p>";
+        } else {
+            echo "<h3>Giỏ hàng của bạn:</h3>";
+            echo "<form method='post' action=''>";
+            echo "<table border='1'>";
+            echo "<tr><th>ID</th><th>Tên sản phẩm</th><th>Giá</th><th>Số lượng</th><th>Tổng cộng</th><th>Hành động</th></tr>";
+            $total = 0;
+
+            foreach ($_SESSION['cart'] as $key => $item) {
+                $price = is_numeric($item['price']) ? (float)$item['price'] : 0;
+                $quantity = is_numeric($item['quantity']) ? (int)$item['quantity'] : 0;
+                $subtotal = $price * $quantity;
+                $total += $subtotal;
+
+                echo "<tr>
+                    <td>{$item['id']}</td>
+                    <td>{$item['name']}</td>
+                    <td>{$price} VNĐ</td>
+                    <td>
+                        <input type='number' name='quantity[{$key}]' value='{$quantity}' min='1' style='width: 60px;' />
+                    </td>
+                    <td>{$subtotal} VNĐ</td>
+                    <td>
+                        <button type='submit' name='update' value='{$key}' class='btn btn-success'>Cập nhật</button>
+                        <button type='submit' name='remove' value='{$key}' class='btn btn-danger'>Xóa</button>
+                    </td>
+                </tr>";
+            }
+
+            echo "<tr><td colspan='4'>Tổng cộng</td><td>{$total} VNĐ</td><td></td></tr>";
+            echo "</table>";
+            echo "</form>";
+        }
+    ?>
+
+
+
 </div>
     <div class="footer">
         <div class="container">

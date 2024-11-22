@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 13, 2024 at 02:49 PM
+-- Generation Time: Nov 20, 2024 at 03:15 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -36,6 +36,15 @@ CREATE TABLE `cthd` (
   `DONGIA` decimal(10,0) NOT NULL,
   `TONGTIENHD` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cthd`
+--
+
+INSERT INTO `cthd` (`ID_CTHD`, `ID_HD`, `SOLUONGSP`, `MOTA`, `TINHTRANG`, `DONGIA`, `TONGTIENHD`) VALUES
+('CT01', 'DH001', 1, 'Không có', 'Đang giao', 323000, 323000),
+('CT02', 'DH002', 2, 'Shop giao hàng lẹ trước ngày mai nhan, để trước cổng nhà, tới nơi gọi em ra.', 'Đã giao', 49000, 98000),
+('CT03', 'DH003', 1, 'Shop giao hàng cẩn thận giúp em.', 'Đã hủy đơn', 56700, 56700);
 
 -- --------------------------------------------------------
 
@@ -86,6 +95,15 @@ CREATE TABLE `hoadon` (
   `DIACHINHAN` varchar(200) NOT NULL,
   `SDTNHAN` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `hoadon`
+--
+
+INSERT INTO `hoadon` (`ID_HD`, `ID_CUS`, `ID_TS`, `DIACHINHAN`, `SDTNHAN`) VALUES
+('DH001', 'KH001', 'DC003', 'Trần Phú, Nha Trang, Khánh Hoà', '0324875963'),
+('DH002', 'KH002', 'HT002', 'Âu Cơ, Nha Trang, Khánh Hoà', '0324478963'),
+('DH003', 'KH002', 'N003', 'Hùng Vương, Tuy Hòa,Phú Yên', '0324875963');
 
 -- --------------------------------------------------------
 
@@ -268,6 +286,14 @@ CREATE TABLE `users_cus` (
   `PHONE_CUS` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `users_cus`
+--
+
+INSERT INTO `users_cus` (`ID_CUS`, `ID_USER`, `FIRSTNAME_CUS`, `LASTNAME_CUS`, `GioiTinh`, `EMAIL_CUS`, `ADDRESS_CUS`, `PHONE_CUS`) VALUES
+('KH001', 24, 'Đào', 'Thị Trinh', 1, 'daothitrinh@gmail.com', '113 Nguyễn Trãi,Nha Trang, Khánh Hòa', '0369524887'),
+('KH002', 24, 'Vũ', 'Thảo Ly', 1, 'vuthaoly@gmail.com', '22 Cẩm Đông, Cẩm Phả, Quảng Ninh', '0345698223');
+
 -- --------------------------------------------------------
 
 --
@@ -287,6 +313,16 @@ CREATE TABLE `users_employeer` (
   `PHONE_EMP` varchar(11) NOT NULL,
   `QUYEN` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users_employeer`
+--
+
+INSERT INTO `users_employeer` (`ID_EMP`, `ID_USER`, `ID_DEP`, `ID_POS`, `FIRSTNAME_EMP`, `LASTNAME_EMP`, `GioiTinh`, `EMAIL_EMP`, `ADDRESS_EMP`, `PHONE_EMP`, `QUYEN`) VALUES
+('EMP01', 22, 'D01', 'P03', 'Hồ', 'Đăng Tài', 0, 'hodangtai@gmail.com', 'Nha Trang, Khánh Hòa', '0972589020', 'Chỉ được xem'),
+('EMP02', 22, 'D04', 'P01', 'Võ', 'Tấn Thành', 0, 'thanhvt@gmail.com', 'Nha Trang, Khánh Hòa', '0389165478', 'Được chỉnh sửa'),
+('EMP03', 22, 'D04', 'P01', 'Nguyễn', 'Thị Nhật Xuân', 1, 'xuanntn@gmail.com', 'Nha Trang, Khánh Hòa', '03965874111', 'Được chỉnh sửa'),
+('EMP04', 22, 'D04', 'P01', 'Phạm', 'Nguyễn Hoài Minh', 0, 'truongnguyengiahung@gmail.com', 'Nha Trang, Khánh Hòa', '0369258147', 'Được chỉnh sửa');
 
 --
 -- Indexes for dumped tables
