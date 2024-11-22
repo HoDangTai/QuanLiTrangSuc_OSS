@@ -484,7 +484,7 @@ if (isset($_POST['remove_from_cart'])) {
                                 <li class="new-header-top-actions-cart">
                                     <a href="giohang.php">
                                         <i class="fas fa-shopping-cart"></i>
-                                        <span>0</span>
+                                        
                                     </a>
                                     <div class="popupCart"></div>
                                 </li>
