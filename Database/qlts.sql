@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 20, 2024 at 03:15 PM
+-- Generation Time: Nov 22, 2024 at 02:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,7 +44,8 @@ CREATE TABLE `cthd` (
 INSERT INTO `cthd` (`ID_CTHD`, `ID_HD`, `SOLUONGSP`, `MOTA`, `TINHTRANG`, `DONGIA`, `TONGTIENHD`) VALUES
 ('CT01', 'DH001', 1, 'Không có', 'Đang giao', 323000, 323000),
 ('CT02', 'DH002', 2, 'Shop giao hàng lẹ trước ngày mai nhan, để trước cổng nhà, tới nơi gọi em ra.', 'Đã giao', 49000, 98000),
-('CT03', 'DH003', 1, 'Shop giao hàng cẩn thận giúp em.', 'Đã hủy đơn', 56700, 56700);
+('CT03', 'DH003', 1, 'Shop giao hàng cẩn thận giúp em.', 'Đã hủy đơn', 56700, 56700),
+('CT04', 'DH017', 1, 'giao quán cạnh nhà giùm em nha', 'dang giao', 546000, 546000);
 
 -- --------------------------------------------------------
 
@@ -101,9 +102,24 @@ CREATE TABLE `hoadon` (
 --
 
 INSERT INTO `hoadon` (`ID_HD`, `ID_CUS`, `ID_TS`, `DIACHINHAN`, `SDTNHAN`) VALUES
+('', 'KH001', 'C002', '65 điện biên phủ, Vĩnh Hoà, Nha Trang, Khánh Hoà', '0972589020'),
 ('DH001', 'KH001', 'DC003', 'Trần Phú, Nha Trang, Khánh Hoà', '0324875963'),
 ('DH002', 'KH002', 'HT002', 'Âu Cơ, Nha Trang, Khánh Hoà', '0324478963'),
-('DH003', 'KH002', 'N003', 'Hùng Vương, Tuy Hòa,Phú Yên', '0324875963');
+('DH003', 'KH002', 'N003', 'Hùng Vương, Tuy Hòa,Phú Yên', '0324875963'),
+('DH004', 'KH001', 'C002', '65 điện biên phủ, nha Trang, Khánh Hoà', '0972589020'),
+('DH005', 'KH001', 'C002', '65 điện biên phủ, nha Trang, Khánh Hoà', '0972589020'),
+('DH006', 'KH001', 'C002', '65 điện biên phủ, nha Trang, Khánh Hoà', '0972589020'),
+('DH007', 'KH001', 'C002', '65 điện biên phủ, nha Trang, Khánh Hoà', '0972589020'),
+('DH008', 'KH001', 'C002', '65 điện biên phủ, nha Trang, Khánh Hoà', '0972589020'),
+('DH009', 'KH001', 'C002', 'gg', '0972589020'),
+('DH010', 'KH001', 'C002', 'test', '0972589020'),
+('DH011', 'KH001', 'C002', 'test', '0972589020'),
+('DH012', 'KH001', 'C002', 'test', '0972589020'),
+('DH013', 'KH001', 'C003', 'test', '0972589020'),
+('DH014', 'KH001', 'C001', 'nha trang, Khánh Hoà', '0972589020'),
+('DH015', 'KH001', 'C007', 'nha trang, Khánh Hoà', '0972589020'),
+('DH016', 'KH001', 'C001', 'gg', '097289020'),
+('DH017', 'KH001', 'C002', '65 Điện Biên Phủ, Vĩnh Hoà, Nha Trang, Khánh Hoà', '0972589020');
 
 -- --------------------------------------------------------
 
@@ -267,7 +283,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`ID_USER`, `NAME`, `EMAIL`, `PASS`, `TYPE_USER`) VALUES
 (22, 'hồ đăng tài', 'hodangtai@gmail.com', 'fifaimaidinh11', 'Administration'),
-(24, 'hotai', 'hotai422@gmail.com', 'hotai2110', 'Customer');
+(24, 'hotai', 'hotai422@gmail.com', 'hotai2110', 'Customer'),
+(25, 'thanhvt', 'votanthanh@gmail.com', 'tin123tin', 'Customer');
 
 -- --------------------------------------------------------
 
@@ -291,8 +308,8 @@ CREATE TABLE `users_cus` (
 --
 
 INSERT INTO `users_cus` (`ID_CUS`, `ID_USER`, `FIRSTNAME_CUS`, `LASTNAME_CUS`, `GioiTinh`, `EMAIL_CUS`, `ADDRESS_CUS`, `PHONE_CUS`) VALUES
-('KH001', 24, 'Đào', 'Thị Trinh', 1, 'daothitrinh@gmail.com', '113 Nguyễn Trãi,Nha Trang, Khánh Hòa', '0369524887'),
-('KH002', 24, 'Vũ', 'Thảo Ly', 1, 'vuthaoly@gmail.com', '22 Cẩm Đông, Cẩm Phả, Quảng Ninh', '0345698223');
+('KH001', 24, 'Hồ', 'Đăng Tài', 0, 'hotai422@gmail.com', 'Nha Trang, Khánh Hòa', '0972589020'),
+('KH002', 25, 'Võ', 'Tấn Thành', 0, 'votanthanh@gmail.com', 'Nha trang, Khánh Hoà', '0922222110');
 
 -- --------------------------------------------------------
 
@@ -413,13 +430,13 @@ ALTER TABLE `users_employeer`
 -- AUTO_INCREMENT for table `giohang`
 --
 ALTER TABLE `giohang`
-  MODIFY `ID_GH` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_GH` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `ID_USER` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `ID_USER` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- Constraints for dumped tables
