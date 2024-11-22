@@ -67,9 +67,9 @@
                 $stmt->execute();
             }
     
-            echo "<script>alert('Product added to cart!'); window.location.href='giohang.php';</script>";
+            
         } else {
-            echo "<script>alert('Product not found!');</script>";
+            echo "<script>alert('Sản phẩm không tồn tại!');</script>";
         }
     }
 ?>

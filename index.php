@@ -7,6 +7,21 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 mysqli_set_charset($conn, 'utf8');
 $query = 'SELECT * FROM sanpham';
 $result = mysqli_query($conn, $query);
+
+session_start();
+if (isset($_SESSION['user_id'])) {
+    if ($_SESSION['user_type'] == 'Administration') {
+        header('location: TrangchuAdmin.php');
+    } elseif ($_SESSION['user_type'] == 'Customer') {
+        header('location: user.php');
+    }
+}
+
+// Access user information from the session
+$user_id = $_SESSION['user_id'];
+$user_name = $_SESSION['user_name'];
+$user_type = $_SESSION['user_type'];
+
 ?>
 
 <!DOCTYPE html>
@@ -289,12 +304,13 @@ $result = mysqli_query($conn, $query);
 </head>
 
 <body>
+    <form action="./xu_ly_dang_nhap.php">
     <header id="new-header" class="stickystack">
         <div class="new-header-top">
             <div class="new-container">
                 <div class="new-header-top-wrap"> 
                     <div class="new-header-top-logo">
-                        <a href="Trangchu.php">
+                        <a href="index.php">
                             <img class="dt-width-auto" width="170" height="35" src="https://file.hstatic.net/200000103143/file/pandora_acf7bd54e6534a07be748b51c51c637c.svg" alt="Pandora Việt Nam"/>
                         </a>
                     </div>
@@ -654,5 +670,6 @@ $result = mysqli_query($conn, $query);
 <?php
 mysqli_close($conn);
 ?>
+    </form>
 </body>
 </html>
