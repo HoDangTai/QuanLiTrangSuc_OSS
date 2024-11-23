@@ -1,7 +1,4 @@
 <?php
-  include 'action_sp.php';
-?>
-<?php
     session_start();
     include ("config.php");
     // Check if the user is logged in
@@ -16,13 +13,15 @@
     $user_name = $_SESSION['user_name'];
     $user_type = $_SESSION['user_type'];
 ?>
-
+<?php
+  include 'action_NV.php';
+?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>General</title>
+    <title>Information employee</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" >
@@ -47,11 +46,13 @@
     margin-top: 5rem;
     height: 100%;
     background-size: cover;
-    position: absolute;
+
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+
 }
 h2 {
     margin-top: 2rem; /* Thêm khoảng cách 2rem cho phần tử h2 bên dưới header */
@@ -158,27 +159,16 @@ h2 {
         /* a:hover::before {
             width: 100%;
         } */
-        .add-product-button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  .add-product-form {
-    display: none;
-    margin-top: 20px;
-  }
-  .account-list {
+        .account-list {
   max-height: 500px; /* Đặt độ cao tối đa cho phần tử chứa danh sách tài khoản */
   overflow-y: scroll; /* Cho phép cuộn nội dung khi vượt quá độ cao tối đa */
-  width: 1090px;
-}
-.action a {
+  width: 1090px;}
+  .action a {
         color: black; /* Đổi màu chữ thành màu đen */
         margin-top: 50px; /* Tăng khoảng cách lề trên lên 50px */
         }
+  
+
       
     </style>
     
@@ -246,10 +236,10 @@ h2 {
                 </div>
             </nav>
         </header>
-  <div class="container-fluid">
+        <div class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-md-10">
-        <h3 class="text-center text-dark mt-2">Danh sách các sản phẩm</h3>
+        <h3 class="text-center text-dark mt-2" style="text-align:center">Danh sách các tài khoản nhân viên</h3>
         <hr>
         <?php if (isset($_SESSION['response'])) { ?>
         <div class="alert alert-<?= $_SESSION['res_type']; ?> alert-dismissible text-center">
@@ -261,124 +251,152 @@ h2 {
     </div>
     <div class="row">
       <div class="col-md-4">
-        <h3 class="text-center text-info">Thêm sản phẩm</h3>
-        <form action="action_sp.php" method="post" enctype="multipart/form-data">
-        <div class="form-group">
-            <input type="text" name="id" value="<?= $id; ?>" class="form-control" placeholder="Nhập ID" <?php if ($id) echo 'readonly'; ?> required>
-          </div>
-          <div class="form-group">
-            <input type="text" name="name" value="<?= $name; ?>" class="form-control" placeholder="Enter name" required>
-          </div>
-          <div class="form-group">
-            <select name="id_ncc" class="form-control" required>
-                <option value="">Chọn nhà cung cấp</option>
-                <?php
-                $query_NCC = "SELECT * FROM NCC";
-                $result_NCC = $conn->query($query_NCC);
-                while ($row_ncc = $result_NCC->fetch_assoc()) {
-                    $ncc_id = $row_ncc['ID_NCC'];
-                    $ncc_name = $row_ncc['NAME_NCC'];
-                    $selected = ($id_ncc == $ncc_id) ? "selected" : "";
-                    echo "<option value=\"$ncc_id\" $selected>$ncc_name</option>";
+        <h3 class="text-center text-info">Thêm tài khoản nhân viên</h3>
+        <form action="action_NV.php" method="post" enctype="multipart/form-data">
+            <select name="id" class="form-control" required>
+            <option value="">Chọn mã user</option>
+            <?php
+                $query_users = "SELECT ID_USER FROM USERS WHERE TYPE_USER = 'Administration'";
+                $result_users = $conn->query($query_users);
+                while ($row_users = $result_users->fetch_assoc()) {
+                $user_id = $row_users['ID_USER'];
+                $selected = ($id == $user_id) ? "selected" : "";
+                echo "<option value=\"$user_id\" $selected>$user_id</option>";
                 }
-                ?>  
+            ?>
+            </select>
+            <br>
+          <div class="form-group">
+            <input type="text" name="id_emp" value="<?= $id_emp; ?>" class="form-control" placeholder="Nhập ID nhân viên" <?php if ($id_emp) echo 'readonly'; ?> required>
+          </div>
+          <div class="form-group">
+            <select name="id_dep" class="form-control" required>
+                <option value="">Chọn phòng ban</option>
+                <?php
+                $query_dep = "SELECT * FROM DEPARTMENT";
+                $result_dep = $conn->query($query_dep);
+                while ($row_dep = $result_dep->fetch_assoc()) {
+                    $dep_id = $row_dep['ID_DEP'];
+                    $dep_name = $row_dep['NAME_DEP'];
+                    $selected = ($id_dep == $dep_id) ? "selected" : "";
+                    echo "<option value=\"$dep_id\" $selected>$dep_name</option>";
+                }
+                ?>
+            </select>
+            </div>
+            <div class="form-group">
+            <select name="id_pos" class="form-control" required>
+                <option value="">Chọn vị trí</option>
+                <?php
+                $query_pos = "SELECT * FROM POSITION";
+                $result_pos = $conn->query($query_pos);
+                while ($row_pos = $result_pos->fetch_assoc()) {
+                    $pos_id = $row_pos['ID_POS'];
+                    $pos_name = $row_pos['NAME_POS'];
+                    $selected = ($id_pos == $pos_id) ? "selected" : "";
+                    echo "<option value=\"$pos_id\" $selected>$pos_name</option>";
+                }
+                ?>
             </select>
             </div>
           <div class="form-group">
-            <input type="number" name="gia" value="<?= $gia; ?>" class="form-control" placeholder="Nhập giá sản phẩm" required>
+            <input type="text" name="firstname_emp" value="<?= $firstname_emp; ?>" class="form-control" placeholder="Nhập họ" required>
           </div>
           <div class="form-group">
-            <select name="id_loaits" class="form-control" required>
-                <option value="">Chọn loại trang sức</option>
+            <input type="text" name="lastname_emp" value="<?= $lastname_emp; ?>" class="form-control" placeholder="Nhập tên" required>
+          </div>
+          <div class="form-group">
+            <select name="gt" class="form-control" required>
+              <option value="">Chọn giới tính</option>
+              <option value="0" <?php if ($gt == 0) echo 'selected'; ?>>Nam</option>
+              <option value="1" <?php if ($gt == 1) echo 'selected'; ?>>Nữ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <input type="email" name="email_emp" value="<?= $email_emp; ?>" class="form-control" placeholder="Nhập email nhân viên" required>
+          </div>
+          <div class="form-group">
+            <input type="text" name="add_emp" value="<?= $add_emp; ?>" class="form-control" placeholder="Nhập địa chỉ nhân viên" required>
+          </div>
+          <div class="form-group">
+            <input type="number" name="phone_emp" value="<?= $phone_emp; ?>" class="form-control" placeholder="Nhập SĐT nhân viên" required>
+          </div>
+          <div class="form-group">
+            <select name="quyen" class="form-control" required>
+                <option value="">Chọn quyền</option>
                 <?php
-                $query_loaits = "SELECT * FROM LOAITRANGSUC";
-                $result_loaits = $conn->query($query_loaits);
-                while ($row_loaits = $result_loaits->fetch_assoc()) {
-                    $loaits_id = $row_loaits['ID_LOAITS'];
-                    $loaits_name = $row_loaits['TENLOAITS'];
-                    $selected = ($id_loaits == $loaits_id) ? "selected" : "";
-                    echo "<option value=\"$loaits_id\" $selected>$loaits_name</option>";
+                $query_quyen = "SELECT DISTINCT QUYEN FROM USERS_EMPLOYEER";
+                $result_quyen = $conn->query($query_quyen);
+                while ($row_quyen = $result_quyen->fetch_assoc()) {
+                    $quyen_value = $row_quyen['QUYEN'];
+                    $selected = ($quyen == $quyen_value) ? "selected" : "";
+                    echo "<option value=\"$quyen_value\" $selected>$quyen_value</option>";
                 }
-                ?>  
+                ?>
             </select>
             </div>
           <div class="form-group">
-            <input type="number" name="baohanh" value="<?= $baohanh; ?>" class="form-control" placeholder="Nhập năm bảo hành" required>
-          </div>
-          <div class="form-group">
-            <input type="text" name="mota" value="<?= $mota; ?>" class="form-control" placeholder="Mô tả" required>
-          </div>
-          <div class="form-group">
-          <div class="form-group">
-          <select name="tinhtrang" class="form-control" required>
-            <option value="còn hàng" <?php if ($tinhtrang == 'còn hàng') echo 'selected'; ?>>Còn hàng</option>
-            <option value="hết hàng" <?php if ($tinhtrang == 'hết hàng') echo 'selected'; ?>>Hết hàng</option>
-          </select>
-        </div>
-        </div>
-          <div class="form-group">
-            <input type="hidden" name="oldimage" value="<?= $photo; ?>">
-            <input type="file" name="image" class="custom-file">
-            <img src="<?= $photo; ?>" width="120" class="img-thumbnail">
-          </div>
-          <div class="form-group">
-            <?php if ($update == true) { ?>
+            <?php if ($id == true) { ?>
             <input type="submit" name="update" class="btn btn-success btn-block" value="Cập nhật">
             <?php } else { ?>
-            <input type="submit" name="add" class="btn btn-primary btn-block" value="Thêm thông tin">
+            <input type="submit" name="add" class="btn btn-primary btn-block" value="Thêm tài khoản">
             <?php } ?>
           </div>
         </form>
       </div>
       <div class="col-md-8">
         <?php
-           $query = 'SELECT u.*, d.NAME_NCC, p.TENLOAITS FROM SANPHAM u
-           JOIN NCC d ON u.ID_NCC = d.ID_NCC
-           JOIN LOAITRANGSUC p ON u.ID_LOAITS = p.ID_LOAITS';
-           $stmt = $conn->prepare($query);
-           $stmt->execute();
-           $result = $stmt->get_result();
+          $query = 'SELECT u.*, d.NAME_DEP, p.NAME_POS FROM USERS_EMPLOYEER u
+          JOIN DEPARTMENT d ON u.ID_DEP = d.ID_DEP
+          JOIN POSITION p ON u.ID_POS = p.ID_POS';
+          $stmt = $conn->prepare($query);
+          $stmt->execute();
+          $result = $stmt->get_result();
         ?>
-        <h3 class="text-center text-info">Các sản phẩm có sẵn trong cơ sở dữ liệu</h3>
+        <h3 class="text-center text-info">Các tài khoản có sẵn trong cơ sở dữ liệu</h3>
         <div class="account-list">
         <table class="table table-hover" id="data-table">
-          <thead>
-            <tr class="text-center">
-            <th>ID</th>
-             <th>Ảnh</th>
-              <th>Tên trang sức</th>
-              <th>NCC</th>
-              <th>Giá(VNĐ)</th>
-              <th>Loại trang sức</th>
-              <th>Bảo hành</th>
-              <th>Mô tả</th>
-              <th>Tình trạng</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php while ($row = $result->fetch_assoc()) { ?>
-            <tr class="text-center">
-              <td><?= $row['ID_TS']; ?></td>
-              <td><img src="images/<?= $row['ANH']; ?>" width="70" ></td>
-              <td><?= $row['TENTS']; ?></td>
-              <td><?= $row['NAME_NCC']; ?></td>
-              <td><?= $row['GIA']; ?></td>
-              <td><?= $row['TENLOAITS']; ?></td>
-              <td><?= $row['BAOHANH']; ?></td>
-              <td><?= $row['MOTA']; ?></td>
-              <td><?= $row['TINHTRANG']; ?></td>
-              <td>
-                <a href="details_sp.php?details=<?= $row['ID_TS']; ?>" class="badge badge-primary p-2">Xem chi tiết</a> |
-                <a href="action_sp.php?delete=<?= $row['ID_TS']; ?>" class="badge badge-danger p-2" onclick="return confirm('Do you want delete this record?');">Xóa</a> |
-                <a href="sanpham.php?edit=<?= $row['ID_TS']; ?>" class="badge badge-success p-2">Chỉnh sửa</a>
-              </td>
-            </tr>
-            <?php } ?>
-          </tbody>
+        <thead>
+  <tr class="text-center">
+    <th>ID NV</th>
+    <th>Phòng ban</th>
+    <th>Vị trí</th>
+    <th>Họ</th>
+    <th>Tên</th>
+    <th>Giới tính</th>
+    <th>Email</th>
+    <th>Địa chỉ</th>
+    <th>SĐT</th>
+    <th>Quyền</th>
+    <th>Thao tác</th>
+  </tr>
+</thead>
+<tbody>
+  <?php while ($row = $result->fetch_assoc()) { 
+    $gt = ($row['GioiTinh'] == 1) ? 'Nữ' : 'Nam';
+  ?>
+  <tr class="text-center">
+    <td><?= $row['ID_EMP']; ?></td>
+    <td><?= $row['NAME_DEP']; ?></td>
+    <td><?= $row['NAME_POS']; ?></td>
+    <td><?= $row['FIRSTNAME_EMP']; ?></td>
+    <td><?= $row['LASTNAME_EMP']; ?></td>
+    <td><?= $gt; ?></td>
+    <td><?= $row['EMAIL_EMP']; ?></td>
+    <td><?= $row['ADDRESS_EMP']; ?></td>
+    <td><?= $row['PHONE_EMP']; ?></td>
+    <td><?= $row['QUYEN']; ?></td>
+    <td>
+      <a href="details_NV.php?details=<?= $row['ID_EMP']; ?>" class="badge badge-primary p-2">Xem chi tiết</a> |
+      <a href="action_NV.php?delete=<?= $row['ID_EMP']; ?>" class="badge badge-danger p-2" onclick="return confirm('Bạn có chắc là muốn xóa?');">Xóa</a> |
+      <a href="info_NV.php?edit=<?= $row['ID_EMP']; ?>" class="badge badge-success p-2">Chỉnh sửa</a>
+    </td>
+  </tr>
+  <?php } ?>
+</tbody>
         </table>
       </div>
-      </div>
+    </div>
     </div>
   </div>
   <script type="text/javascript">
@@ -388,6 +406,6 @@ h2 {
     });
   });
   </script>
-</body>
-
+    </div>
+    </body>
 </html>
