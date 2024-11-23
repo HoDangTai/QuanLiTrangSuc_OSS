@@ -276,7 +276,7 @@ h2 {
         <div class="account-list">
         <table class="table table-hover" id="data-table">
           <thead>
-            <tr>
+            <tr class="text-center">
             <th>ID</th>
               <th>ID HĐ</th>
               <th>Họ KH</th>
@@ -294,7 +294,7 @@ h2 {
           </thead>
           <tbody>
             <?php while ($row = $result->fetch_assoc()) { ?>
-            <tr>
+            <tr class="text-center">
               <td><?= $row['ID_CTHD']; ?></td>
               <td><?= $row['ID_HD']; ?></td>
               <td><?= $row['FIRSTNAME_CUS']; ?></td>
