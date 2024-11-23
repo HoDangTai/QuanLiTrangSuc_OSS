@@ -5,16 +5,14 @@
     if ($conn->connect_error) {
         die("Kết nối thất bại: " . $conn->connect_error);
     }
-    $name="";
-    $email="";
-    $address="";
+
     $error="";
     session_start();
     if (isset($_SESSION['user_id'])) {
         // Lấy thông tin người dùng từ cơ sở dữ liệu
         $user_id = $_SESSION['user_id'];
 
-        $sql = "SELECT * FROM USERS_EMPLOYEER WHERE ID_USER = ?";
+        $sql = "SELECT * FROM USERS_CUS WHERE ID_USER = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -23,12 +21,12 @@
         if ($result->num_rows > 0) {
             // Hiển thị thông tin người dùng
             $row = $result->fetch_assoc();
-            $name = $row["FIRSTNAME_EMP"] . " " . $row["LASTNAME_EMP"];
-            $email = $row["EMAIL_EMP"];
-            $phone = $row["PHONE_EMP"];
-            $address = $row["ADDRESS_EMP"];
+            $name = $row["FIRSTNAME_CUS"] . " " . $row["LASTNAME_CUS"];
+            $email = $row["EMAIL_CUS"];
+            $phone = $row["PHONE_CUS"];
+            $address = $row["ADDRESS_CUS"];
         } else {
-            // echo $error = "Không tìm thấy thông tin người dùng";
+            echo $error = "Không tìm thấy thông tin người dùng";
         }
     } else {
         // Người dùng chưa đăng nhập, thực hiện các hành động khác (ví dụ: chuyển hướng đến trang đăng nhập)
@@ -558,7 +556,6 @@
             <input id="address" name="address" value="<?php echo $address; ?>">
             <label><?php echo $error; ?></label>
             <div align="center">
-                <a href="update.php" class="btn">Cập nhật</a>
                 <a href="logout.php" class="btn">Đăng xuất</a>
             </div>
         </form>
