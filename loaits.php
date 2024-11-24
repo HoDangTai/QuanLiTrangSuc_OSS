@@ -241,14 +241,14 @@ h2 {
         <h3 class="text-center text-info">Thêm loại trang sức</h3>
         <form action="action_loaits.php" method="post" enctype="multipart/form-data">
           <div class="form-group">
-            <input type="text" name="id_loaits" value="<?= $id_loaits; ?>" class="form-control" placeholder="Nhập ID loại trang sức " required>
+            <input type="text" name="id_loaits" value="<?= $id_loaits; ?>" class="form-control" placeholder="Nhập ID loại trang sức " <?php if ($id_loaits) echo 'readonly'; ?> required>
           </div>
           <div class="form-group">
             <input type="text" name="tenloaits" value="<?= $tenloaits; ?>" class="form-control" placeholder="Nhập tên loại trang sức" required>
           </div>
           <div class="form-group">
             <?php if ($id_loaits == true) { ?>
-            <input type="submit" name="update" class="btn btn-success btn-block" value="Cập nhập">
+            <input type="submit" name="update" class="btn btn-success btn-block" value="Cập nhật">
             <?php } else { ?>
             <input type="submit" name="add" class="btn btn-primary btn-block" value="Thêm thông tin">
             <?php } ?>
@@ -265,7 +265,7 @@ h2 {
         <h3 class="text-center text-info">Các loại có sẵn trong cơ sở dữ liệu</h3>
         <table class="table table-hover" id="data-table">
           <thead>
-            <tr>
+            <tr class="text-center">
               <th>ID</th>
               <th>Tên loại trang sức</th>
               <th>Thao tác</th>
@@ -273,7 +273,7 @@ h2 {
           </thead>
           <tbody>
             <?php while ($row = $result->fetch_assoc()) { ?>
-            <tr>
+            <tr class="text-center">
               <td><?= $row['ID_LOAITS']; ?></td>
               <td><?= $row['TENLOAITS']; ?></td>
 
