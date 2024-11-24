@@ -57,7 +57,7 @@
         <h1>Thanh toán thành công!</h1>
         <p>Cảm ơn bạn đã mua sắm tại cửa hàng của chúng tôi.</p>
         <p>Mã đơn hàng của bạn: <strong><?php echo htmlspecialchars($_GET['order_id'] ?? ''); ?></strong></p>
-        <a href="index.php" class="btn btn-custom">Tiếp tục mua sắm</a>
+        <a href="user.php" class="btn btn-custom">Tiếp tục mua sắm</a>
     </div>
 </body>
 

@@ -149,11 +149,11 @@
         // }
       
         // Tiếp tục thực hiện câu truy vấn UPDATE
-        $query = "UPDATE USERS_EMPLOYEER SET ID_DEP =?, ID_POS =? 
+        $query = "UPDATE USERS_EMPLOYEER SET ID_USER=?, ID_DEP =?, ID_POS =? 
         ,FIRSTNAME_EMP=?, LASTNAME_EMP=?, GioiTinh=?, EMAIL_EMP =?,
         ADDRESS_EMP=?, PHONE_EMP=?, QUYEN  =? WHERE ID_EMP=?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("ssssisssss", $id_dep, $id_pos, $firstname_emp ,
+        $stmt->bind_param("sssssisssss",$id, $id_dep, $id_pos, $firstname_emp ,
         $lastname_emp,$gt,$email_emp, $add_emp,$phone_emp, $quyen,  $id_emp);
         $stmt->execute();
       

@@ -280,7 +280,7 @@ $result = mysqli_query($conn, $query);
             <div class="new-container">
                 <div class="new-header-top-wrap"> 
                     <div class="new-header-top-logo">
-                        <a href="index.php">
+                        <a href="user.php">
                             <img class="dt-width-auto" width="170" height="35" src="https://file.hstatic.net/200000103143/file/pandora_acf7bd54e6534a07be748b51c51c637c.svg" alt="Pandora Việt Nam"/>
                         </a>
                     </div>

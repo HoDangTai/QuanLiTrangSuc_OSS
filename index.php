@@ -8,19 +8,9 @@ mysqli_set_charset($conn, 'utf8');
 $query = 'SELECT * FROM sanpham';
 $result = mysqli_query($conn, $query);
 
-session_start();
-if (isset($_SESSION['user_id'])) {
-    if ($_SESSION['user_type'] == 'Administration') {
-        header('location: TrangchuAdmin.php');
-    } elseif ($_SESSION['user_type'] == 'Customer') {
-        header('location: user.php');
-    }
-}
 
-// Access user information from the session
-$user_id = $_SESSION['user_id'];
-$user_name = $_SESSION['user_name'];
-$user_type = $_SESSION['user_type'];
+
+
 
 ?>
 

@@ -12,7 +12,7 @@
         // Lấy thông tin người dùng từ cơ sở dữ liệu
         $user_id = $_SESSION['user_id'];
 
-        $sql = "SELECT * FROM USERS_CUS WHERE ID_USER = ?";
+        $sql = "SELECT * FROM USERS_EMPLOYEER WHERE ID_USER = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -21,10 +21,10 @@
         if ($result->num_rows > 0) {
             // Hiển thị thông tin người dùng
             $row = $result->fetch_assoc();
-            $name = $row["FIRSTNAME_CUS"] . " " . $row["LASTNAME_CUS"];
-            $email = $row["EMAIL_CUS"];
-            $phone = $row["PHONE_CUS"];
-            $address = $row["ADDRESS_CUS"];
+            $name = $row["FIRSTNAME_EMP"] . " " . $row["LASTNAME_EMP"];
+            $email = $row["EMAIL_EMP"];
+            $phone = $row["PHONE_EMP"];
+            $address = $row["ADDRESS_EMP"];
         } else {
             echo $error = "Không tìm thấy thông tin người dùng";
         }
@@ -363,7 +363,7 @@
             <div class="new-container">
                 <div class="new-header-top-wrap"> 
                     <div class="new-header-top-logo">
-                        <a href="/">
+                        <a href="TrangchuAdmin.php">
                             <img class="dt-width-auto" width="170" height="35" src="https://file.hstatic.net/200000103143/file/pandora_acf7bd54e6534a07be748b51c51c637c.svg" alt="Pandora Việt Nam"/>
                         </a>
                     </div>
