@@ -14,14 +14,14 @@
     $user_type = $_SESSION['user_type'];
 ?>
 <?php
-  include 'action_loaits.php';
+  include 'action.php';
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Loại trang sức</title>
+    <title>General</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" >
@@ -123,7 +123,6 @@ h2 {
             font-weight: 600;
             position: relative;
         }
-
         .compact-tbody {
     font-size: 14px;
 }
@@ -148,15 +147,19 @@ h2 {
             height: 1px;
             transition: all 0.3s;
         }
-
-        /* a:hover::before {
+/* 
+        a:hover::before {
             width: 100%;
         } */
-        .action a {
+        .account-list {
+  max-height: 500px; /* Đặt độ cao tối đa cho phần tử chứa danh sách tài khoản */
+  overflow-y: scroll; /* Cho phép cuộn nội dung khi vượt quá độ cao tối đa */
+  width: 900px;
+}
+.action a {
         color: black; /* Đổi màu chữ thành màu đen */
         margin-top: 50px; /* Tăng khoảng cách lề trên lên 50px */
         }
-      
     </style>
     
 </head>
@@ -226,7 +229,7 @@ h2 {
         <div class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-md-10">
-        <h3 class="text-center text-dark mt-2">Danh sách các loại trang sức</h3>
+        <h3 class="text-center text-dark mt-2">Danh sách các tài khoản</h3>
         <hr>
         <?php if (isset($_SESSION['response'])) { ?>
         <div class="alert alert-<?= $_SESSION['res_type']; ?> alert-dismissible text-center">
@@ -238,54 +241,79 @@ h2 {
     </div>
     <div class="row">
       <div class="col-md-4">
-        <h3 class="text-center text-info">Thêm loại trang sức</h3>
-        <form action="action_loaits.php" method="post" enctype="multipart/form-data">
+        <h3 class="text-center text-info">Thêm tài khoản</h3>
+        <form action="action.php" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="id" value="<?= $id; ?>">
           <div class="form-group">
-            <input type="text" name="id_loaits" value="<?= $id_loaits; ?>" class="form-control" placeholder="Nhập ID loại trang sức " <?php if ($id_loaits) echo 'readonly'; ?> required>
+            <input type="text" name="name" value="<?= $name; ?>" class="form-control" placeholder="Nhập tên tài khoản" required>
           </div>
           <div class="form-group">
-            <input type="text" name="tenloaits" value="<?= $tenloaits; ?>" class="form-control" placeholder="Nhập tên loại trang sức" required>
+            <input type="email" name="email" value="<?= $email; ?>" class="form-control" placeholder="Nhập email" required>
           </div>
           <div class="form-group">
-            <?php if ($id_loaits == true) { ?>
-            <input type="submit" name="update" class="btn btn-success btn-block" value="Cập nhật">
+            <input type="text" name="password" value="<?= $password; ?>" class="form-control" placeholder="Nhập mật khẩu" required>
+          </div>
+          <div class="form-group">
+          <select name="typeuser" class="form-control" required>
+            <option value="">Chọn loại tài khoản</option>
+            <?php
+              $query_typeuser = "SELECT DISTINCT TYPE_USER FROM USERS";
+              $result_typeuser = $conn->query($query_typeuser);
+              while ($row_typeuser = $result_typeuser->fetch_assoc()) {
+                $typeuser_value = $row_typeuser['TYPE_USER'];
+                $selected = ($typeuser == $typeuser_value) ? "selected" : "";
+                echo "<option value=\"$typeuser_value\" $selected>$typeuser_value</option>";
+              }
+            ?>
+          </select>
+          </div>
+          <div class="form-group">
+            <?php if ($id == true) { ?>
+            <input type="submit" name="update" class="btn btn-success btn-block" value="Cập nhập">
             <?php } else { ?>
-            <input type="submit" name="add" class="btn btn-primary btn-block" value="Thêm thông tin">
+            <input type="submit" name="add" class="btn btn-primary btn-block" value="Thêm tài khoản">
             <?php } ?>
           </div>
         </form>
       </div>
       <div class="col-md-8">
         <?php
-          $query = 'SELECT * FROM LOAITRANGSUC';
+          $query = 'SELECT * FROM USERS';
           $stmt = $conn->prepare($query);
           $stmt->execute();
           $result = $stmt->get_result();
         ?>
-        <h3 class="text-center text-info">Các loại có sẵn trong cơ sở dữ liệu</h3>
+        <h3 class="text-center text-info">Các tài khoản có sẵn trong cơ sở dữ liệu</h3>
+        <div class="account-list">
         <table class="table table-hover" id="data-table">
           <thead>
-            <tr class="text-center">
-              <th>ID</th>
-              <th>Tên loại trang sức</th>
+            <tr>
+              <th>#</th>
+              <th>Tên tài khoản</th>
+              <th>Email</th>
+              <th>Mật khẩu</th>
+              <th>Loại tài khoản</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
             <?php while ($row = $result->fetch_assoc()) { ?>
-            <tr class="text-center">
-              <td><?= $row['ID_LOAITS']; ?></td>
-              <td><?= $row['TENLOAITS']; ?></td>
-
+            <tr>
+              <td><?= $row['ID_USER']; ?></td>
+              <td><?= $row['NAME']; ?></td>
+              <td><?= $row['EMAIL']; ?></td>
+              <td><?= $row['PASS']; ?></td>
+              <td><?= $row['TYPE_USER']; ?></td>
               <td>
-                <a href="details_loaits.php?details=<?= $row['ID_LOAITS']; ?>" class="badge badge-primary p-2">Xem chi tiết</a> |
-                <a href="action_loaits.php?delete=<?= $row['ID_LOAITS']; ?>" class="badge badge-danger p-2" onclick="return confirm('Bạn có chắc là muốn xóa?');">Xóa</a> |
-                <a href="loaits.php?edit=<?= $row['ID_LOAITS']; ?>" class="badge badge-success p-2">Chỉnh sửa</a>
+                <a href="details.php?details=<?= $row['ID_USER']; ?>" class="badge badge-primary p-2">Xem chi tiết</a> |
+                <a href="action.php?delete=<?= $row['ID_USER']; ?>" class="badge badge-danger p-2" onclick="return confirm('Bạn có chắc là muốn xóa?');">Xóa</a> |
+                <a href="general1.php?edit=<?= $row['ID_USER']; ?>" class="badge badge-success p-2">Chỉnh sửa</a>
               </td>
             </tr>
             <?php } ?>
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   </div>

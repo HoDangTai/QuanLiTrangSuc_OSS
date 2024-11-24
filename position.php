@@ -14,14 +14,15 @@
     $user_type = $_SESSION['user_type'];
 ?>
 <?php
-  include 'action_loaits.php';
+  include 'action_pos.php';
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Loại trang sức</title>
+    <title>Phòng ban</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" >
@@ -148,15 +149,15 @@ h2 {
             height: 1px;
             transition: all 0.3s;
         }
-
-        /* a:hover::before {
+/* 
+        a:hover::before {
             width: 100%;
-        } */
-        .action a {
+        }
+       */
+      .action a {
         color: black; /* Đổi màu chữ thành màu đen */
         margin-top: 50px; /* Tăng khoảng cách lề trên lên 50px */
         }
-      
     </style>
     
 </head>
@@ -226,7 +227,7 @@ h2 {
         <div class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-md-10">
-        <h3 class="text-center text-dark mt-2">Danh sách các loại trang sức</h3>
+        <h3 class="text-center text-dark mt-2">Danh sách các vị trí </h3>
         <hr>
         <?php if (isset($_SESSION['response'])) { ?>
         <div class="alert alert-<?= $_SESSION['res_type']; ?> alert-dismissible text-center">
@@ -238,16 +239,16 @@ h2 {
     </div>
     <div class="row">
       <div class="col-md-4">
-        <h3 class="text-center text-info">Thêm loại trang sức</h3>
-        <form action="action_loaits.php" method="post" enctype="multipart/form-data">
+        <h3 class="text-center text-info">Thêm vị trí</h3>
+        <form action="action_pos.php" method="post" enctype="multipart/form-data">
           <div class="form-group">
-            <input type="text" name="id_loaits" value="<?= $id_loaits; ?>" class="form-control" placeholder="Nhập ID loại trang sức " <?php if ($id_loaits) echo 'readonly'; ?> required>
+            <input type="text" name="id_pos" value="<?= $id_pos; ?>" class="form-control" placeholder="Nhập ID vị trí" <?php if ($id_pos) echo 'readonly'; ?> required>
           </div>
           <div class="form-group">
-            <input type="text" name="tenloaits" value="<?= $tenloaits; ?>" class="form-control" placeholder="Nhập tên loại trang sức" required>
+            <input type="text" name="tenvitri" value="<?= $tenvitri; ?>" class="form-control" placeholder="Nhập tên vị trí" required>
           </div>
           <div class="form-group">
-            <?php if ($id_loaits == true) { ?>
+            <?php if ($id_pos == true) { ?>
             <input type="submit" name="update" class="btn btn-success btn-block" value="Cập nhật">
             <?php } else { ?>
             <input type="submit" name="add" class="btn btn-primary btn-block" value="Thêm thông tin">
@@ -257,30 +258,29 @@ h2 {
       </div>
       <div class="col-md-8">
         <?php
-          $query = 'SELECT * FROM LOAITRANGSUC';
+          $query = 'SELECT * FROM POSITION';
           $stmt = $conn->prepare($query);
           $stmt->execute();
           $result = $stmt->get_result();
         ?>
-        <h3 class="text-center text-info">Các loại có sẵn trong cơ sở dữ liệu</h3>
+        <h3 class="text-center text-info">Các vị trí có sẵn trong cơ sở dữ liệu</h3>
         <table class="table table-hover" id="data-table">
           <thead>
             <tr class="text-center">
               <th>ID</th>
-              <th>Tên loại trang sức</th>
+              <th>Tên vị trí</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
             <?php while ($row = $result->fetch_assoc()) { ?>
             <tr class="text-center">
-              <td><?= $row['ID_LOAITS']; ?></td>
-              <td><?= $row['TENLOAITS']; ?></td>
-
+              <td><?= $row['ID_POS']; ?></td>
+              <td><?= $row['NAME_POS']; ?></td>
               <td>
-                <a href="details_loaits.php?details=<?= $row['ID_LOAITS']; ?>" class="badge badge-primary p-2">Xem chi tiết</a> |
-                <a href="action_loaits.php?delete=<?= $row['ID_LOAITS']; ?>" class="badge badge-danger p-2" onclick="return confirm('Bạn có chắc là muốn xóa?');">Xóa</a> |
-                <a href="loaits.php?edit=<?= $row['ID_LOAITS']; ?>" class="badge badge-success p-2">Chỉnh sửa</a>
+                <a href="details_pos.php?details=<?= $row['ID_POS']; ?>" class="badge badge-primary p-2">Xem chi tiết</a> |
+                <a href="action_pos.php?delete=<?= $row['ID_POS']; ?>" class="badge badge-danger p-2" onclick="return confirm('Bạn có chắc là muốn xóa?');">Xóa</a> |
+                <a href="position.php?edit=<?= $row['ID_POS']; ?>" class="badge badge-success p-2">Chỉnh sửa</a>
               </td>
             </tr>
             <?php } ?>
